@@ -1,0 +1,270 @@
+/* ========================================
+   A2CMS Design System Variables
+   Based on Element Plus Best Practices
+   Spacing: 8px Grid System
+   ======================================== */
+
+/* Day Theme - Light Mode */
+:root {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f2f5;
+  --bg-active: #e9eef4;
+
+  /* Text Colors - Typography Hierarchy */
+  --text-primary: #1f2937;    /* 标题/重要文字 */
+  --text-regular: #4b5563;    /* 正文文字 */
+  --text-secondary: #6b7280;   /* 次要文字 */
+  --text-placeholder: #9ca3af; /* 占位符/禁用 */
+  --text-muted: #d1d5db;       /* 极淡文字 */
+
+  /* Brand Colors */
+  --primary: #409eff;         /* Element Plus Primary */
+  --primary-hover: #66b1ff;
+  --primary-light: #ecf5ff;
+  --primary-dark: #337ecc;
+
+  /* Semantic Colors */
+  --success: #67c23a;
+  --success-light: #f0f9eb;
+  --warning: #e6a23c;
+  --warning-light: #fdf6ec;
+  --danger: #f56c6c;
+  --danger-light: #fef0f0;
+  --info: #909399;
+  --info-light: #f4f4f5;
+
+  /* Gold Accent (A2CMS Brand) */
+  --accent: #e6c25c;
+  --accent-hover: #d4b04d;
+  --accent-light: rgba(232, 193, 107, 0.1);
+  --accent-bg: rgba(232, 193, 107, 0.08);
+
+  /* Border Colors */
+  --border-base: #dcdfe6;
+  --border-light: #e4e7ed;
+  --border-lighter: #ebeef5;
+  --border-hover: #c0c4cc;
+
+  /* Shadow System (8px grid) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.12);
+
+  /* Spacing System (8px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Component Sizes */
+  --header-height: 56px;
+  --button-height-sm: 28px;
+  --button-height-base: 32px;
+  --button-height-lg: 36px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* Night Theme - Dark Mode */
+[data-theme="night"] {
+  /* Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-hover: #273548;
+  --bg-active: #2d3f59;
+
+  /* Text Colors */
+  --text-primary: #f1f5f9;
+  --text-regular: #cbd5e1;
+  --text-secondary: #94a3b8;
+  --text-placeholder: #64748b;
+  --text-muted: #475569;
+
+  /* Brand Colors - Adjusted for dark */
+  --primary: #60a5fa;
+  --primary-hover: #93c5fd;
+  --primary-light: #1e3a5f;
+  --primary-dark: #3b82f6;
+
+  /* Semantic Colors - Adjusted */
+  --success: #34d399;
+  --success-light: #064e3b;
+  --warning: #fbbf24;
+  --warning-light: #451a03;
+  --danger: #f87171;
+  --danger-light: #450a0a;
+  --info: #a1a1aa;
+  --info-light: #27272a;
+
+  /* Gold Accent - Adjusted for dark */
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --accent-light: rgba(251, 191, 36, 0.15);
+  --accent-bg: rgba(251, 191, 36, 0.08);
+
+  /* Border Colors */
+  --border-base: #334155;
+  --border-light: #3d4a63;
+  --border-lighter: #475569;
+  --border-hover: #64748b;
+
+  /* Shadows - Darker */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* ========================================
+   Global Resets & Base Styles
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Helvetica Neue', sans-serif;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* ========================================
+   Element Plus Theme Overrides
+   ======================================== */
+
+/* Light Mode Element Plus */
+:root {
+  --el-color-primary: var(--primary);
+  --el-color-primary-light-3: var(--primary-light);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-regular);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-text-color-placeholder: var(--text-placeholder);
+  --el-border-color: var(--border-base);
+  --el-border-color-light: var(--border-light);
+  --el-fill-color-blank: var(--bg-card);
+  --el-bg-color: var(--bg-secondary);
+  --el-hover-bg-color: var(--bg-hover);
+}
+
+/* Dark Mode Element Plus */
+[data-theme="night"] {
+  --el-color-primary: var(--primary);
+  --el-color-primary-light-3: var(--primary-light);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-regular);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-text-color-placeholder: var(--text-placeholder);
+  --el-border-color: var(--border-base);
+  --el-border-color-light: var(--border-light);
+  --el-fill-color-blank: var(--bg-card);
+  --el-bg-color: var(--bg-secondary);
+  --el-hover-bg-color: var(--bg-hover);
+}
+
+/* ========================================
+   App Container
+   ======================================== */
+
+.app-wrapper {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+/* ========================================
+   Typography Utilities
+   ======================================== */
+
+.text-primary { color: var(--text-primary); }
+.text-regular { color: var(--text-regular); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-danger { color: var(--danger); }
+
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-medium { font-weight: var(--font-weight-medium); }
+
+/* ========================================
+   Layout Utilities
+   ======================================== */
+
+.section {
+  margin-bottom: var(--space-6);
+}
+
+.section-gap {
+  margin-bottom: var(--space-4);
+}
+
+/* ========================================
+   Responsive Breakpoints
+   ======================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-base: 13px;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --font-size-base: 15px;
+  }
+}
