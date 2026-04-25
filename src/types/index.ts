@@ -51,12 +51,14 @@ export interface Character {
   maxRuns: number      // 远征基础上限 (默认14)
   extraRuns: number    // 远征补充上限 (默认10)
   finalRuns: number   // 远征最终消灭次数
+  extraFinalRuns: number // 远征最终补充次数
   maxFinalRuns: number // 远征最终上限 (默认35)
   // 超越
   transcendRuns: number // 超越当前次数
   maxTranscendRuns: number // 超越基础上限 (默认7)
   extraTranscendRuns: number  // 超越补充上限 (默认10)
   transcendFinalRuns: number // 超越最终消灭次数
+  extraTranscendFinalRuns: number // 超越最终补充次数
   maxTranscendFinalRuns: number // 超越最终上限 (默认28)
   // 圣域-卢德莱
   ludrelleRuns: number      // 挑战当前次数
@@ -110,6 +112,8 @@ export interface AccountData {
   shugoExtra: number            // 补充次数
   shugoMax: number             // 基本上限(14)
   shugoExtraMax: number        // 补充上限(30)
+  // 深渊指令
+  abyssOrderCompleted: boolean  // 是否完成深渊指令
   // 噩梦挑战
   nightmareRuns: number        // 挑战当前次数
   nightmareExtra: number       // 补充次数
@@ -121,6 +125,12 @@ export interface AccountData {
   // 每日使命
   dailyMissionRuns: number     // 当前次数
   dailyMissionMax: number      // 上限(5)
+  // 商店奥德
+  shopRuns: number             // 商店奥德当前次数
+  shopMax: number             // 上限(1)
+  // 转换奥德
+  exchangeRuns: number         // 转换奥德当前次数
+  exchangeMax: number         // 上限(1)
   // 会员
   isMember: boolean            // 是否会员
   memberExpireTime?: number    // 会员到期时间戳(毫秒)
@@ -160,4 +170,5 @@ export interface UISettings {
   customSortEnabled: boolean
   sortLocked: boolean
   themeMode: 'game' | 'eyeCare'  // 游戏主题 / 护眼模式
+  serverRegion: 'cn' | 'kr'  // 服务器大区：国服/韩服
 }
