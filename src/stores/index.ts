@@ -9,7 +9,7 @@ import type {
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
 // localStorage 键名
-const STORAGE_KEY = 'a2cms_data'
+const STORAGE_KEY = 'a2cms_v2'
 
 // 默认账号数据
 const defaultAccountData = (): AccountData => ({
@@ -21,6 +21,7 @@ const defaultAccountData = (): AccountData => ({
   shugoExtra: 29,
   shugoMax: 14,
   shugoExtraMax: 30,
+  abyssOrderCompleted: false,
   nightmareRuns: 14,
   nightmareExtra: 29,
   nightmareMax: 14,
@@ -28,7 +29,11 @@ const defaultAccountData = (): AccountData => ({
   weeklyMissionRuns: 12,
   weeklyMissionMax: 12,
   dailyMissionRuns: 5,
-  dailyMissionMax: 5
+  dailyMissionMax: 5,
+  shopRuns: 20,
+  shopMax: 20,
+  exchangeRuns: 20,
+  exchangeMax: 20
 })
 
 // 从 localStorage 读取数据
@@ -89,11 +94,13 @@ const createDefaultCharacter = (overrides?: Partial<Character>): Character => ({
   maxRuns: 14,
   extraRuns: 10,
   finalRuns: 0,
+  extraFinalRuns: 0,
   maxFinalRuns: 35,
   transcendRuns: 4,
-  maxTranscendRuns: 7,
+  maxTranscendRuns: 10,
   extraTranscendRuns: 10,
   transcendFinalRuns: 0,
+  extraTranscendFinalRuns: 0,
   maxTranscendFinalRuns: 28,
   // 圣域-卢德莱
   ludrelleRuns: 4,
@@ -193,7 +200,10 @@ export const useAccountStore = defineStore('accounts', () => {
       Object.keys(updates).forEach(key => {
         const keyName = key as keyof AccountData
         const val = updates[key]
-        if (key.includes('Runs')) {
+        // 处理深渊指令完成状态（布尔类型）
+        if (key === 'abyssOrderCompleted') {
+          (account.data as any)[keyName] = val.runs === 1
+        } else if (key.includes('Runs')) {
           (account.data as any)[keyName] = val.runs
         } else {
           (account.data as any)[keyName] = val.extra
@@ -214,6 +224,18 @@ export const useAccountStore = defineStore('accounts', () => {
       }
     }
   }
+
+  // 删除账号
+  const deleteAccount = (id: string) => {
+    const index = accounts.value.findIndex((a: Account) => a.id === id)
+    if (index !== -1) {
+      accounts.value.splice(index, 1)
+      // 如果删除的是当前账号，重置选中状态
+      if (currentAccountId.value === id) {
+        currentAccountId.value = accounts.value[0]?.id || ''
+      }
+    }
+  }
   
   return {
     accounts,
@@ -222,7 +244,8 @@ export const useAccountStore = defineStore('accounts', () => {
     setCurrentAccount,
     addAccount,
     updateAccount,
-    updateAccountData
+    updateAccountData,
+    deleteAccount
   }
 })
 
@@ -230,8 +253,8 @@ export const useAccountStore = defineStore('accounts', () => {
 export const useCharacterStore = defineStore('characters', () => {
   // 角色列表 - 从 localStorage 读取
   const characters = ref<Character[]>(loadFromStorage(`${STORAGE_KEY}_characters`, [
-    createDefaultCharacter({ name: '角色示例1', role: '剑星', kina: 50000, score: 8500, combatPower: 12000, runs: 10, maxRuns: 14, extraRuns: 10, finalRuns: 19, maxFinalRuns: 35, transcendRuns: 6, maxTranscendRuns: 7, extraTranscendRuns: 10, transcendFinalRuns: 19, maxTranscendFinalRuns: 28, ludrelleRuns: 4, ludrelleExtra: 1, ludrelleRewardRuns: 2, ludrelleRewardExtra: 1, purifyRuns: 4, purifyExtra: 1, purifyRewardRuns: 2, purifyRewardExtra: 1, nightmareRuns: 8, nightmareExtra: 10, nightmareMax: 14, nightmareExtraMax: 30, notes: '主输出角色' }),
-    createDefaultCharacter({ name: '角色示例2', role: '杀星', kina: 35000, score: 7800, combatPower: 9500, runs: 8, maxRuns: 14, extraRuns: 10, finalRuns: 12, maxFinalRuns: 35, transcendRuns: 4, maxTranscendRuns: 7, extraTranscendRuns: 10, transcendFinalRuns: 10, maxTranscendFinalRuns: 28, ludrelleRuns: 2, ludrelleExtra: 0, ludrelleRewardRuns: 1, ludrelleRewardExtra: 0, purifyRuns: 3, purifyExtra: 1, purifyRewardRuns: 1, purifyRewardExtra: 0, nightmareRuns: 6, nightmareExtra: 8, nightmareMax: 14, nightmareExtraMax: 30 })
+    createDefaultCharacter({ name: '角色示例1', role: '剑星', kina: 50000, score: 8500, combatPower: 12000, runs: 10, maxRuns: 14, extraRuns: 10, finalRuns: 19, extraFinalRuns: 0, maxFinalRuns: 35, transcendRuns: 6, maxTranscendRuns: 7, extraTranscendRuns: 10, transcendFinalRuns: 19, extraTranscendFinalRuns: 0, maxTranscendFinalRuns: 28, ludrelleRuns: 4, ludrelleExtra: 1, ludrelleRewardRuns: 2, ludrelleRewardExtra: 1, purifyRuns: 4, purifyExtra: 1, purifyRewardRuns: 2, purifyRewardExtra: 1, nightmareRuns: 8, nightmareExtra: 10, nightmareMax: 14, nightmareExtraMax: 30, notes: '主输出角色' }),
+    createDefaultCharacter({ name: '角色示例2', role: '杀星', kina: 35000, score: 7800, combatPower: 9500, runs: 8, maxRuns: 14, extraRuns: 10, finalRuns: 12, extraFinalRuns: 0, maxFinalRuns: 35, transcendRuns: 4, maxTranscendRuns: 7, extraTranscendRuns: 10, transcendFinalRuns: 10, extraTranscendFinalRuns: 0, maxTranscendFinalRuns: 28, ludrelleRuns: 2, ludrelleExtra: 0, ludrelleRewardRuns: 1, ludrelleRewardExtra: 0, purifyRuns: 3, purifyExtra: 1, purifyRewardRuns: 1, purifyRewardExtra: 0, nightmareRuns: 6, nightmareExtra: 8, nightmareMax: 14, nightmareExtraMax: 30 })
   ]))
 
   // 筛选条件
@@ -263,12 +286,24 @@ export const useCharacterStore = defineStore('characters', () => {
   // 统计计算
   const totalStats = computed(() => {
     const accounts = useAccountStore().accounts
-    // 统计每日使命完成情况
-    const completedDailyMissions = characters.value.filter((c: Character) => c.tasks.dailyQuest).length
-    const totalDailyMissions = characters.value.length
-    // 统计每周指令完成情况（基于账号数据）
-    const completedWeeklyMissions = characters.value.filter((c: Character) => c.tasks.localOrder).length
-    const totalWeeklyMissions = characters.value.length
+    // 统计每日副本完成情况（基于账号数据，0=已完成，非0=未完成，清空即为完成）
+    const completedDailyMissions = accounts.filter((a: Account) => (a.data.dailyDungeonRuns ?? 0) === 0).length
+    const totalDailyMissions = accounts.length
+    // 统计每日使命完成情况（基于账号数据，0=已完成，非0=未完成）
+    const completedDailyQuest = accounts.filter((a: Account) => (a.data.dailyMissionRuns ?? 0) === 0).length
+    const totalDailyQuest = accounts.length
+    // 统计本地指令完成情况（基于账号数据，0=已完成，非0=未完成）
+    const completedWeeklyMissions = accounts.filter((a: Account) => (a.data.weeklyMissionRuns ?? 0) === 0).length
+    const totalWeeklyMissions = accounts.length
+    // 统计深渊指令完成情况
+    const completedAbyssOrders = accounts.filter((a: Account) => a.data.abyssOrderCompleted).length
+    const totalAbyssOrders = accounts.length
+    // 统计商店奥德完成情况（已完成的账号数/总账号数，runs=0视为完成）
+    const completedShop = accounts.filter((a: Account) => (a.data.shopRuns ?? 0) === 0).length
+    const totalShop = accounts.length
+    // 统计转换奥德完成情况（已完成的账号数/总账号数，runs=0视为完成）
+    const completedExchange = accounts.filter((a: Account) => (a.data.exchangeRuns ?? 0) === 0).length
+    const totalExchange = accounts.length
     // 统计会员情况
     const activeMembers = accounts.filter((a: Account) => a.data.isMember).length
     const now = Date.now()
@@ -282,7 +317,8 @@ export const useCharacterStore = defineStore('characters', () => {
       totalAccounts: accounts.length,
       totalChars: characters.value.length,
       totalKina: characters.value.reduce((sum: number, c: Character) => sum + c.kina, 0),
-      totalEnergy: characters.value.reduce((sum: number, c: Character) => sum + c.energy, 0),
+      totalBaseEnergy: characters.value.reduce((sum: number, c: Character) => sum + c.energy, 0),
+      totalExtraEnergy: characters.value.reduce((sum: number, c: Character) => sum + c.extraEnergy, 0),
       totalRuns: characters.value.reduce((sum: number, c: Character) => sum + c.runs, 0),
       totalTranscendRuns: characters.value.reduce((sum: number, c: Character) => sum + c.transcendRuns, 0),
       availableRuns: characters.value.reduce((sum: number, c: Character) => sum + Math.max(0, Math.min(21, c.runs)), 0),
@@ -291,8 +327,16 @@ export const useCharacterStore = defineStore('characters', () => {
       totalExtraTranscendRuns: characters.value.reduce((sum: number, c: Character) => sum + c.extraTranscendRuns, 0),
       completedDailyMissions,
       totalDailyMissions,
+      completedDailyQuest,
+      totalDailyQuest,
       completedWeeklyMissions,
       totalWeeklyMissions,
+      completedAbyssOrders,
+      totalAbyssOrders,
+      completedShop,
+      totalShop,
+      completedExchange,
+      totalExchange,
       expiringMembers,
       activeMembers,
       fullEnergyChars,
@@ -579,7 +623,8 @@ export const useUIStore = defineStore('ui', () => {
     showStats: true,
     customSortEnabled: false,
     sortLocked: false,
-    themeMode: 'game'
+    themeMode: 'game',
+    serverRegion: 'cn'
   }))
 
   // 监听变化
@@ -607,13 +652,18 @@ export const useUIStore = defineStore('ui', () => {
     settings.value.themeMode = mode
   }
 
+  const setServerRegion = (region: 'cn' | 'kr') => {
+    settings.value.serverRegion = region
+  }
+
   return {
     settings,
     setLayout,
     setSortMode,
     toggleTasks,
     toggleStats,
-    setThemeMode
+    setThemeMode,
+    setServerRegion
   }
 })
 
