@@ -67,8 +67,86 @@
             >
               编辑
             </el-button>
+            <el-button
+              size="small"
+              link
+              type="danger"
+              @click.stop="handleAccountDelete(account.id)"
+            >
+              删除
+            </el-button>
           </div>
           <div class="account-row-data">
+            <!-- 每日使命 -->
+            <div
+              class="data-cell mini mission-cell"
+              :class="{ 'is-cleared': (account.data.dailyMissionRuns ?? 0) === 0 }"
+              @click.stop="toggleMissionComplete(account.id, 'dailyMission')"
+            >
+              <span class="data-label">每日使命</span>
+              <span class="data-value">
+                <el-icon v-if="(account.data.dailyMissionRuns ?? 0) === 0" class="check-icon"><CircleCheck /></el-icon>
+                <span v-else class="uncompleted">未完成</span>
+              </span>
+            </div>
+            <!-- 本地指令 -->
+            <div
+              class="data-cell mini mission-cell"
+              :class="{ 'is-cleared': (account.data.weeklyMissionRuns ?? 0) === 0 }"
+              @click.stop="toggleMissionComplete(account.id, 'weeklyMission')"
+            >
+              <span class="data-label">本地指令</span>
+              <span class="data-value">
+                <el-icon v-if="(account.data.weeklyMissionRuns ?? 0) === 0" class="check-icon"><CircleCheck /></el-icon>
+                <span v-else class="uncompleted">未完成</span>
+              </span>
+            </div>
+            <!-- 深渊指令 -->
+            <div
+              class="data-cell mini mission-cell"
+              :class="{ 'is-cleared': account.data.abyssOrderCompleted }"
+              @click.stop="toggleAbyssOrder(account.id)"
+            >
+              <span class="data-label">深渊指令</span>
+              <span class="data-value">
+                <el-icon v-if="account.data.abyssOrderCompleted" class="check-icon"><CircleCheck /></el-icon>
+                <span v-else class="uncompleted">未完成</span>
+              </span>
+            </div>
+            <!-- 商店奥德 -->
+            <div
+              class="data-cell mini"
+              :class="{ 'is-cleared': (account.data.shopRuns ?? 0) === 0 }"
+              @click.stop="openAccountEditDialog(account.id, 'shop')"
+            >
+              <el-button
+                v-if="(account.data.shopRuns ?? 0) > 0"
+                size="small"
+                class="clear-btn"
+                @click.stop="clearAccountData(account.id, 'shop')"
+              >清</el-button>
+              <span class="data-label">商店奥德</span>
+              <span class="data-value">
+                {{ account.data.shopRuns ?? 0 }}/{{ account.data.shopMax ?? 20 }}
+              </span>
+            </div>
+            <!-- 转换奥德 -->
+            <div
+              class="data-cell mini"
+              :class="{ 'is-cleared': (account.data.exchangeRuns ?? 0) === 0 }"
+              @click.stop="openAccountEditDialog(account.id, 'exchange')"
+            >
+              <el-button
+                v-if="(account.data.exchangeRuns ?? 0) > 0"
+                size="small"
+                class="clear-btn"
+                @click.stop="clearAccountData(account.id, 'exchange')"
+              >清</el-button>
+              <span class="data-label">转换奥德</span>
+              <span class="data-value">
+                {{ account.data.exchangeRuns ?? 0 }}/{{ account.data.exchangeMax ?? 20 }}
+              </span>
+            </div>
             <!-- 每日副本 -->
             <div
               class="data-cell mini"
@@ -100,47 +178,11 @@
                 class="clear-btn"
                 @click.stop="clearAccountData(account.id, 'shugo')"
               >清</el-button>
-              <span class="data-label">树古</span>
+              <span class="data-label">树古庆典</span>
               <span class="data-value">
                 {{ account.data.shugoRuns ?? 0 }}
                 <span class="data-plus">(+{{ account.data.shugoExtra ?? 0 }})</span>
                 /{{ account.data.shugoMax ?? 14 }}
-              </span>
-            </div>
-            <!-- 每周指令 -->
-            <div
-              class="data-cell mini"
-              :class="{ 'is-cleared': (account.data.weeklyMissionRuns ?? 0) === 0 }"
-              @click.stop="openAccountEditDialog(account.id, 'weeklyMission')"
-            >
-              <el-button
-                v-if="(account.data.weeklyMissionRuns ?? 0) > 0"
-                size="small"
-                class="clear-btn"
-                @click.stop="clearAccountData(account.id, 'weeklyMission')"
-              >清</el-button>
-              <span class="data-label">每周指令</span>
-              <span class="data-value">
-                {{ account.data.weeklyMissionRuns ?? 0 }}
-                /{{ account.data.weeklyMissionMax ?? 12 }}
-              </span>
-            </div>
-            <!-- 每日使命 -->
-            <div
-              class="data-cell mini"
-              :class="{ 'is-cleared': (account.data.dailyMissionRuns ?? 0) === 0 }"
-              @click.stop="openAccountEditDialog(account.id, 'dailyMission')"
-            >
-              <el-button
-                v-if="(account.data.dailyMissionRuns ?? 0) > 0"
-                size="small"
-                class="clear-btn"
-                @click.stop="clearAccountData(account.id, 'dailyMission')"
-              >清</el-button>
-              <span class="data-label">每日使命</span>
-              <span class="data-value">
-                {{ account.data.dailyMissionRuns ?? 0 }}
-                /{{ account.data.dailyMissionMax ?? 5 }}
               </span>
             </div>
           </div>
@@ -272,7 +314,8 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
 import { useAccountStore } from '@/stores'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { CircleCheck } from '@element-plus/icons-vue'
 import { raceList, raceServers } from '@/dict'
 import type { Race } from '@/types'
 
@@ -313,7 +356,7 @@ const currentAccountId = computed(() => accountStore.currentAccountId)
 const showEditDialog = ref(false)
 const showAddDialog = ref(false)
 const showEditAccountDialog = ref(false)
-const editType = ref<'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission'>('dailyDungeon')
+const editType = ref<'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission' | 'shop' | 'exchange'>('dailyDungeon')
 
 // 当前正在编辑的账号ID (用于全部账号视图下的编辑)
 const editingAccountId = ref('')
@@ -339,7 +382,7 @@ const selectAccount = (accountId: string) => {
 }
 
 // 打开指定账号的数据编辑弹窗 (用于全部账号视图)
-const openAccountEditDialog = (accountId: string, type: 'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission') => {
+const openAccountEditDialog = (accountId: string, type: 'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission' | 'shop' | 'exchange') => {
   editingAccountId.value = accountId
   editType.value = type
   const account = accountStore.accounts.find(a => a.id === accountId)
@@ -359,6 +402,12 @@ const openAccountEditDialog = (accountId: string, type: 'dailyDungeon' | 'shugo'
         break
       case 'dailyMission':
         editForm.value = { current: account.data.dailyMissionRuns ?? 0, extra: 0 }
+        break
+      case 'shop':
+        editForm.value = { current: account.data.shopRuns ?? 0, extra: 0 }
+        break
+      case 'exchange':
+        editForm.value = { current: account.data.exchangeRuns ?? 0, extra: 0 }
         break
     }
   }
@@ -445,7 +494,9 @@ const editDialogTitle = computed(() => {
     shugo: '树古庆典',
     nightmare: '噩梦挑战',
     weeklyMission: '每周指令',
-    dailyMission: '每日使命'
+    dailyMission: '每日使命',
+    shop: '商店奥德',
+    exchange: '转换奥德'
   }
   return `编辑 ${titles[editType.value]}`
 })
@@ -462,6 +513,8 @@ const editMax = computed(() => {
     case 'nightmare': return data.nightmareMax ?? 14
     case 'weeklyMission': return data.weeklyMissionMax ?? 12
     case 'dailyMission': return data.dailyMissionMax ?? 5
+    case 'shop': return data.shopMax ?? 20
+    case 'exchange': return data.exchangeMax ?? 20
     default: return 14
   }
 })
@@ -477,6 +530,8 @@ const extraMax = computed(() => {
     case 'nightmare': return data.nightmareExtraMax ?? 30
     case 'weeklyMission': return 0
     case 'dailyMission': return 0
+    case 'shop': return 0
+    case 'exchange': return 0
     default: return 30
   }
 })
@@ -509,6 +564,20 @@ const openEditAccountDialog = (accountId?: string) => {
 // 编辑指定账号
 const handleAccountEdit = (accountId: string) => {
   openEditAccountDialog(accountId)
+}
+
+// 删除指定账号
+const handleAccountDelete = (accountId: string) => {
+  ElMessageBox.confirm('确定要删除该账号吗？删除后将无法恢复。', '删除确认', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    accountStore.deleteAccount(accountId)
+    ElMessage.success('账号已删除')
+  }).catch(() => {
+    // 取消删除
+  })
 }
 
 // 确认编辑账号
@@ -576,6 +645,12 @@ const confirmEdit = () => {
     case 'dailyMission':
       updates.dailyMissionRuns = { runs: editForm.value.current, extra: 0 }
       break
+    case 'shop':
+      updates.shopRuns = { runs: editForm.value.current, extra: 0 }
+      break
+    case 'exchange':
+      updates.exchangeRuns = { runs: editForm.value.current, extra: 0 }
+      break
   }
   // 使用正在编辑的账号ID，如果没有则使用当前账号ID
   const targetAccountId = editingAccountId.value || currentAccountId.value
@@ -612,7 +687,7 @@ const clearData = (type: 'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission
 }
 
 // 全部账号视图中清空指定账号数据
-const clearAccountData = (accountId: string, type: 'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission') => {
+const clearAccountData = (accountId: string, type: 'dailyDungeon' | 'shugo' | 'nightmare' | 'weeklyMission' | 'dailyMission' | 'shop' | 'exchange') => {
   const updates: Record<string, { runs: number, extra: number }> = {}
   switch (type) {
     case 'dailyDungeon':
@@ -633,9 +708,71 @@ const clearAccountData = (accountId: string, type: 'dailyDungeon' | 'shugo' | 'n
     case 'dailyMission':
       updates.dailyMissionRuns = { runs: 0, extra: 0 }
       break
+    case 'shop':
+      updates.shopRuns = { runs: 0, extra: 0 }
+      break
+    case 'exchange':
+      updates.exchangeRuns = { runs: 0, extra: 0 }
+      break
   }
   accountStore.updateAccountData(accountId, updates)
   ElMessage.success('已清空')
+}
+
+// 切换深渊指令完成状态
+const toggleAbyssOrder = (accountId: string) => {
+  const account = accountStore.accounts.find(a => a.id === accountId)
+  if (account) {
+    accountStore.updateAccountData(accountId, {
+      abyssOrderCompleted: { runs: account.data.abyssOrderCompleted ? 0 : 1, extra: 0 }
+    })
+  }
+}
+
+// 切换每日使命/本地指令/商店奥德/转换奥德完成状态
+const toggleMissionComplete = (accountId: string, type: 'dailyMission' | 'weeklyMission' | 'shop' | 'exchange') => {
+  const account = accountStore.accounts.find(a => a.id === accountId)
+  if (account) {
+    let currentRuns: number
+    let maxRuns: number
+    switch (type) {
+      case 'dailyMission':
+        currentRuns = account.data.dailyMissionRuns
+        maxRuns = account.data.dailyMissionMax ?? 5
+        break
+      case 'weeklyMission':
+        currentRuns = account.data.weeklyMissionRuns
+        maxRuns = account.data.weeklyMissionMax ?? 12
+        break
+      case 'shop':
+        currentRuns = account.data.shopRuns
+        maxRuns = account.data.shopMax ?? 20
+        break
+      case 'exchange':
+        currentRuns = account.data.exchangeRuns
+        maxRuns = account.data.exchangeMax ?? 20
+        break
+    }
+    // 如果当前是完成状态(0)，则设为未完成(max)；如果当前是未完成状态(max)，则设为完成(0)
+    const newRuns = currentRuns === 0 ? maxRuns : 0
+    if (type === 'dailyMission') {
+      accountStore.updateAccountData(accountId, { dailyMissionRuns: { runs: newRuns, extra: 0 } })
+    } else if (type === 'weeklyMission') {
+      accountStore.updateAccountData(accountId, { weeklyMissionRuns: { runs: newRuns, extra: 0 } })
+    } else if (type === 'shop') {
+      accountStore.updateAccountData(accountId, { shopRuns: { runs: newRuns, extra: 0 } })
+    } else if (type === 'exchange') {
+      accountStore.updateAccountData(accountId, { exchangeRuns: { runs: newRuns, extra: 0 } })
+    }
+  }
+}
+
+// 快速完成深渊指令
+const completeAbyssOrder = (accountId: string) => {
+  accountStore.updateAccountData(accountId, {
+    abyssOrderCompleted: { runs: 1, extra: 0 }
+  })
+  ElMessage.success('深渊指令已完成')
 }
 
 const addAccount = () => {
@@ -877,5 +1014,29 @@ const addAccount = () => {
   font-size: var(--font-size-xs);
   color: var(--warning);
   font-weight: var(--font-weight-medium);
+}
+
+.abyss-order {
+  min-width: 90px;
+}
+
+.mission-cell {
+  min-width: 90px;
+  cursor: pointer;
+}
+
+.mission-cell .data-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-icon {
+  color: var(--success);
+  font-size: 18px;
+}
+
+.uncompleted {
+  color: var(--text-secondary);
 }
 </style>
