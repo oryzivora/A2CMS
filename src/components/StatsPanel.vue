@@ -17,129 +17,231 @@
     </div>
 
     <!-- 第一行：待办卡片 -->
-    <el-row :gutter="12" class="stats-row">
-      <!-- 每日使命 -->
-      <el-col :xs="24" :sm="12" :md="6">
-        <el-card shadow="hover" class="todo-card" body-class="card-body">
-          <template #header>
-            <div class="card-header-content">
-              <span class="card-icon">📋</span>
-              <span class="card-title">每日使命</span>
-              <el-tag size="small" :type="dailyProgress >= 100 ? 'success' : 'warning'" effect="plain">
-                {{ stats.completedDailyMissions }}/{{ stats.totalDailyMissions }}
-              </el-tag>
-            </div>
-          </template>
-          <div class="card-body-content">
-            <el-progress
-              :percentage="dailyProgress"
-              :stroke-width="6"
-              :color="progressColor(dailyProgress)"
-              :show-text="false"
-            />
-            <div class="progress-hint">
-              <span v-if="dailyProgress < 100" class="hint-text warning">
-                还有 {{ stats.totalDailyMissions - stats.completedDailyMissions }} 项待完成
-              </span>
-              <span v-else class="hint-text success">
-                ✓ 今日已完成
-              </span>
-            </div>
+    <div class="stats-row cards-flex">
+      <!-- 每日副本 -->
+      <el-card shadow="hover" class="todo-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">📋</span>
+            <span class="card-title">每日副本</span>
+            <el-tag size="small" :type="dailyProgress >= 100 ? 'success' : 'warning'" effect="plain">
+              {{ stats.completedDailyMissions }}/{{ stats.totalDailyMissions }}
+            </el-tag>
           </div>
-        </el-card>
-      </el-col>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="dailyProgress"
+            :stroke-width="6"
+            :color="progressColor(dailyProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="dailyProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalDailyMissions - stats.completedDailyMissions }} 个账号待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 全部完成
+            </span>
+          </div>
+        </div>
+      </el-card>
 
-      <!-- 每周指令 -->
-      <el-col :xs="24" :sm="12" :md="6">
-        <el-card shadow="hover" class="todo-card" body-class="card-body">
-          <template #header>
-            <div class="card-header-content">
-              <span class="card-icon">📜</span>
-              <span class="card-title">每周指令</span>
-              <el-tag size="small" :type="weeklyProgress >= 100 ? 'success' : 'info'" effect="plain">
-                {{ stats.completedWeeklyMissions }}/{{ stats.totalWeeklyMissions }}
-              </el-tag>
-            </div>
-          </template>
-          <div class="card-body-content">
-            <el-progress
-              :percentage="weeklyProgress"
-              :stroke-width="6"
-              :color="progressColor(weeklyProgress)"
-              :show-text="false"
-            />
-            <div class="progress-hint">
-              <span v-if="weeklyProgress < 100" class="hint-text warning">
-                还有 {{ stats.totalWeeklyMissions - stats.completedWeeklyMissions }} 项待完成
-              </span>
-              <span v-else class="hint-text success">
-                ✓ 本周已完成
-              </span>
-            </div>
+      <!-- 每日使命 -->
+      <el-card shadow="hover" class="todo-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">🎯</span>
+            <span class="card-title">每日使命</span>
+            <el-tag size="small" :type="dailyQuestProgress >= 100 ? 'success' : 'warning'" effect="plain">
+              {{ stats.completedDailyQuest }}/{{ stats.totalDailyQuest }}
+            </el-tag>
           </div>
-        </el-card>
-      </el-col>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="dailyQuestProgress"
+            :stroke-width="6"
+            :color="progressColor(dailyQuestProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="dailyQuestProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalDailyQuest - stats.completedDailyQuest }} 个账号待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 全部完成
+            </span>
+          </div>
+        </div>
+      </el-card>
+
+      <!-- 本地指令书 -->
+      <el-card shadow="hover" class="todo-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">📜</span>
+            <span class="card-title">本地指令书</span>
+            <el-tag size="small" :type="weeklyProgress >= 100 ? 'success' : 'info'" effect="plain">
+              {{ stats.completedWeeklyMissions }}/{{ stats.totalWeeklyMissions }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="weeklyProgress"
+            :stroke-width="6"
+            :color="progressColor(weeklyProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="weeklyProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalWeeklyMissions - stats.completedWeeklyMissions }} 项待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 本周已完成
+            </span>
+          </div>
+        </div>
+      </el-card>
+
+      <!-- 深渊指令书 -->
+      <el-card shadow="hover" class="todo-card abyss-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">⚡</span>
+            <span class="card-title">深渊指令书</span>
+            <el-tag size="small" :type="abyssProgress >= 100 ? 'success' : 'info'" effect="plain">
+              {{ stats.completedAbyssOrders }}/{{ stats.totalAbyssOrders }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="abyssProgress"
+            :stroke-width="6"
+            :color="progressColor(abyssProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="abyssProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalAbyssOrders - stats.completedAbyssOrders }} 项待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 全部完成
+            </span>
+          </div>
+        </div>
+      </el-card>
+
+      <!-- 商店奥德 -->
+      <el-card shadow="hover" class="todo-card shop-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">🛒</span>
+            <span class="card-title">商店奥德</span>
+            <el-tag size="small" :type="shopProgress >= 100 ? 'success' : 'info'" effect="plain">
+              {{ stats.completedShop }}/{{ stats.totalShop }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="shopProgress"
+            :stroke-width="6"
+            :color="progressColor(shopProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="shopProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalShop - stats.completedShop }} 项待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 全部完成
+            </span>
+          </div>
+        </div>
+      </el-card>
+
+      <!-- 转换奥德 -->
+      <el-card shadow="hover" class="todo-card exchange-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">🔄</span>
+            <span class="card-title">转换奥德</span>
+            <el-tag size="small" :type="exchangeProgress >= 100 ? 'success' : 'info'" effect="plain">
+              {{ stats.completedExchange }}/{{ stats.totalExchange }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <el-progress
+            :percentage="exchangeProgress"
+            :stroke-width="6"
+            :color="progressColor(exchangeProgress)"
+            :show-text="false"
+          />
+          <div class="progress-hint">
+            <span v-if="exchangeProgress < 100" class="hint-text warning">
+              还有 {{ stats.totalExchange - stats.completedExchange }} 项待完成
+            </span>
+            <span v-else class="hint-text success">
+              ✓ 全部完成
+            </span>
+          </div>
+        </div>
+      </el-card>
 
       <!-- 远征可刷 -->
-      <el-col :xs="24" :sm="12" :md="6">
-        <el-card shadow="hover" class="todo-card runs-card" body-class="card-body">
-          <template #header>
-            <div class="card-header-content">
-              <span class="card-icon">⚔️</span>
-              <span class="card-title">远征副本</span>
-              <el-tag size="small" :type="stats.availableRuns > 0 ? 'danger' : 'success'" effect="plain">
-                {{ stats.availableRuns > 0 ? `${stats.availableRuns} 可刷` : '已刷完' }}
-              </el-tag>
+      <el-card shadow="hover" class="todo-card runs-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">⚔️</span>
+            <span class="card-title">远征副本</span>
+            <el-tag size="small" :type="stats.availableRuns > 0 ? 'danger' : 'success'" effect="plain">
+              {{ stats.availableRuns > 0 ? `${stats.availableRuns} 可刷` : '已刷完' }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span class="stat-label">奖励次数</span>
+              <span class="stat-value">{{ stats.totalRuns }} 次</span>
             </div>
-          </template>
-          <div class="card-body-content">
-            <div class="stat-rows">
-              <div class="stat-row">
-                <span class="stat-label">总剩余</span>
-                <span class="stat-value">{{ stats.totalRuns }} 次</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">可补充</span>
-                <span class="stat-value warning">{{ stats.totalExtraRuns }} 次</span>
-              </div>
-            </div>
-            <div class="action-hint">
-              <span class="hint-text info">点击账号管理快速编辑</span>
+            <div class="stat-row">
+              <span class="stat-label">补充次数</span>
+              <span class="stat-value warning">{{ stats.totalExtraRuns }} 次</span>
             </div>
           </div>
-        </el-card>
-      </el-col>
+        </div>
+      </el-card>
 
       <!-- 超越可刷 -->
-      <el-col :xs="24" :sm="12" :md="6">
-        <el-card shadow="hover" class="todo-card transcend-card" body-class="card-body">
-          <template #header>
-            <div class="card-header-content">
-              <span class="card-icon">🚀</span>
-              <span class="card-title">超越副本</span>
-              <el-tag size="small" :type="stats.availableTranscendRuns > 0 ? 'danger' : 'success'" effect="plain">
-                {{ stats.availableTranscendRuns > 0 ? `${stats.availableTranscendRuns} 可刷` : '已刷完' }}
-              </el-tag>
+      <el-card shadow="hover" class="todo-card transcend-card" body-class="card-body">
+        <template #header>
+          <div class="card-header-content">
+            <span class="card-icon">🚀</span>
+            <span class="card-title">超越副本</span>
+            <el-tag size="small" :type="stats.availableTranscendRuns > 0 ? 'danger' : 'success'" effect="plain">
+              {{ stats.availableTranscendRuns > 0 ? `${stats.availableTranscendRuns} 可刷` : '已刷完' }}
+            </el-tag>
+          </div>
+        </template>
+        <div class="card-body-content">
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span class="stat-label">奖励次数</span>
+              <span class="stat-value">{{ stats.totalTranscendRuns }} 次</span>
             </div>
-          </template>
-          <div class="card-body-content">
-            <div class="stat-rows">
-              <div class="stat-row">
-                <span class="stat-label">总剩余</span>
-                <span class="stat-value">{{ stats.totalTranscendRuns }} 次</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">可补充</span>
-                <span class="stat-value warning">{{ stats.totalExtraTranscendRuns }} 次</span>
-              </div>
-            </div>
-            <div class="action-hint">
-              <span class="hint-text info">点击账号管理快速编辑</span>
+            <div class="stat-row">
+              <span class="stat-label">补充次数</span>
+              <span class="stat-value warning">{{ stats.totalExtraTranscendRuns }} 次</span>
             </div>
           </div>
-        </el-card>
-      </el-col>
-    </el-row>
+        </div>
+      </el-card>
+    </div>
 
     <!-- 第二行：快捷概览 -->
     <el-row :gutter="8" class="stats-row quick-row">
@@ -162,9 +264,12 @@
         </div>
       </el-col>
       <el-col :xs="12" :sm="6" :md="3">
-        <div class="quick-stat">
-          <span class="quick-value">{{ formatEnergy(stats.totalEnergy) }}</span>
-          <span class="quick-label">总能量</span>
+        <div class="quick-stat energy-stat">
+          <div class="energy-values">
+            <span class="quick-value">{{ formatEnergy(stats.totalBaseEnergy) }}</span>
+            <span class="quick-value extra">(+{{ formatEnergy(stats.totalExtraEnergy) }})</span>
+          </div>
+          <span class="quick-label">基础(+补充)能量</span>
         </div>
       </el-col>
       <el-col :xs="12" :sm="6" :md="3">
@@ -204,7 +309,8 @@ interface Stats {
   totalChars: number
   totalAccounts: number
   totalKina: number
-  totalEnergy: number
+  totalBaseEnergy: number
+  totalExtraEnergy: number
   totalRuns: number
   totalTranscendRuns: number
   availableRuns: number
@@ -213,8 +319,16 @@ interface Stats {
   totalExtraTranscendRuns: number
   completedDailyMissions: number
   totalDailyMissions: number
+  completedDailyQuest: number
+  totalDailyQuest: number
   completedWeeklyMissions: number
   totalWeeklyMissions: number
+  completedAbyssOrders: number
+  totalAbyssOrders: number
+  completedShop: number
+  totalShop: number
+  completedExchange: number
+  totalExchange: number
   expiringMembers: number
   activeMembers: number
   fullEnergyChars: number
@@ -234,9 +348,29 @@ const dailyProgress = computed(() => {
   return Math.round((props.stats.completedDailyMissions / props.stats.totalDailyMissions) * 100)
 })
 
+const dailyQuestProgress = computed(() => {
+  if (props.stats.totalDailyQuest === 0) return 0
+  return Math.round((props.stats.completedDailyQuest / props.stats.totalDailyQuest) * 100)
+})
+
 const weeklyProgress = computed(() => {
   if (props.stats.totalWeeklyMissions === 0) return 0
   return Math.round((props.stats.completedWeeklyMissions / props.stats.totalWeeklyMissions) * 100)
+})
+
+const abyssProgress = computed(() => {
+  if (props.stats.totalAbyssOrders === 0) return 0
+  return Math.round((props.stats.completedAbyssOrders / props.stats.totalAbyssOrders) * 100)
+})
+
+const shopProgress = computed(() => {
+  if (props.stats.totalShop === 0) return 0
+  return Math.round((props.stats.completedShop / props.stats.totalShop) * 100)
+})
+
+const exchangeProgress = computed(() => {
+  if (props.stats.totalExchange === 0) return 0
+  return Math.round((props.stats.completedExchange / props.stats.totalExchange) * 100)
 })
 
 const formatKina = (num: number) => {
@@ -292,6 +426,53 @@ const progressColor = (percentage: number) => {
 /* 卡片行 */
 .stats-row {
   margin-bottom: var(--space-4);
+}
+
+/* 卡片行 - 响应式布局 */
+.cards-flex {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.cards-flex :deep(.el-card) {
+  flex: 1 1 calc(16% - var(--space-3));
+  min-width: 140px;
+  max-width: 200px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1400px) {
+  .cards-flex :deep(.el-card) {
+    flex: 1 1 calc(20% - var(--space-3));
+    min-width: 130px;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .cards-flex :deep(.el-card) {
+    flex: 1 1 calc(25% - var(--space-3));
+    min-width: 120px;
+    max-width: 160px;
+  }
+}
+
+@media (max-width: 900px) {
+  .cards-flex :deep(.el-card) {
+    flex: 1 1 calc(33.333% - var(--space-3));
+    min-width: 110px;
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-flex :deep(.el-card) {
+    flex: 1 1 calc(50% - var(--space-3));
+    min-width: 100px;
+    max-width: 140px;
+  }
 }
 
 /* 卡片样式 */
@@ -387,6 +568,36 @@ const progressColor = (percentage: number) => {
   color: var(--warning);
 }
 
+/* 深渊指令卡片 */
+.abyss-card :deep(.el-card__header) {
+  border-bottom-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.abyss-card .card-icon {
+  color: var(--primary);
+}
+
+/* 商店奥德卡片 */
+.shop-card :deep(.el-card__header) {
+  border-bottom-color: var(--success);
+  background: var(--success-light);
+}
+
+.shop-card .card-icon {
+  color: var(--success);
+}
+
+/* 转换奥德卡片 */
+.exchange-card :deep(.el-card__header) {
+  border-bottom-color: var(--warning);
+  background: var(--warning-light);
+}
+
+.exchange-card .card-icon {
+  color: var(--warning);
+}
+
 /* 快捷统计 */
 .quick-row {
   margin-bottom: 0;
@@ -416,6 +627,12 @@ const progressColor = (percentage: number) => {
   line-height: 1.2;
 }
 
+.quick-value.extra {
+  font-size: var(--font-size-sm);
+  color: var(--warning);
+  font-weight: var(--font-weight-normal);
+}
+
 .quick-label {
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
@@ -431,5 +648,17 @@ const progressColor = (percentage: number) => {
 
 .quick-stat.success-stat .quick-value {
   color: var(--success);
+}
+
+.energy-stat {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.energy-values {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
 }
 </style>
