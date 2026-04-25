@@ -15,6 +15,17 @@
     <div class="header-right">
       <span class="header-version">2026 v1.0</span>
 
+      <!-- 服务器选择 -->
+      <el-select
+        v-model="uiStore.settings.serverRegion"
+        size="small"
+        style="width: 110px"
+        @change="handleServerRegionChange"
+      >
+        <el-option label="国服 (CN)" value="cn" />
+        <el-option label="韩服 (KR)" value="kr" />
+      </el-select>
+
       <el-dropdown trigger="click" @command="handleSettingsCommand">
         <el-button size="default" circle class="settings-btn">
           <el-icon :size="16"><Setting /></el-icon>
@@ -76,6 +87,11 @@ const handleSettingsCommand = (command: string) => {
       ElMessage.success('数据已导出')
       break
   }
+}
+
+const handleServerRegionChange = (region: 'cn' | 'kr') => {
+  uiStore.setServerRegion(region)
+  ElMessage.success(`已切换到${region === 'cn' ? '国服' : '韩服'}`)
 }
 </script>
 
