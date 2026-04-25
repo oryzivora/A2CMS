@@ -4,7 +4,7 @@
 
 ## 📝 文档说明
 此文档用于记录 A2CMS 项目的所有功能需求、设计决策和实现细节。
-最后更新：2026-04-17 (账号系统更新)
+最后更新：2026-04-24
 
 ---
 
@@ -46,7 +46,7 @@
 
 ### 2.2 数据存储
 - **存储方式**：localStorage
-- **存储键名**：`a2cms_data_*`
+- **存储键名**：`a2cms_v2_*`
 - **数据格式**：JSON
 - **自动同步**：数据变更时自动保存
 
@@ -95,13 +95,17 @@ A2CMS/
 | 角色锁定 | 防止误删重要角色 | P0 | ✅ | 使用 Lock/Unlock 图标 |
 | 能量跟踪 | 奥德能量（上限840点） | P0 | ✅ | 使用 el-progress 条纹进度条 |
 | 副本计数 | 远征/超越副本次数 | P0 | ✅ | 使用 el-input-number 快速调整 |
-| 任务状态 | 9种任务完成状态 | P1 | ✅ | 使用 el-tag 可点击标签 |
+| 任务状态 | 5种任务完成状态（每日签到、深渊回廊、觉醒战、卢德莱、净化所） | P1 | ✅ | 使用 el-tag 可点击标签，表格模式同步 |
 | 分组管理 | 自定义分组及颜色 | P1 | ✅ | 使用 el-dialog 子组件 |
 | 小队管理 | 批量操作支持 | P1 | ⚠️ | 功能简化，待完善 |
 | 数据导入/导出 | JSON格式备份 | P1 | ✅ | 优化导入弹窗 |
 | 筛选与排序 | 多条件筛选、多种排序 | P1 | ✅ | 使用 el-radio-group 排序 |
-| 统计面板 | 总览所有角色数据 | P1 | ✅ | 使用 el-statistic 统计组件 |
+| 统计面板 | 总览所有角色数据（待办风格） | P1 | ✅ | 响应式flex-wrap布局 |
 | 布局切换 | 2/3/4/5网格及表格 | P2 | ✅ | 使用 el-button-group |
+| 商店奥德统计 | 账号维度商店奥德完成追踪 | P2 | ✅ | 统计面板卡片 |
+| 转换奥德统计 | 账号维度转换奥德完成追踪 | P2 | ✅ | 统计面板卡片 |
+| 会员管理 | 会员到期时间，中文日历 | P2 | ✅ | el-date-picker zh-CN |
+| 服务器选择 | CN/KR服务器独立选择器 | P2 | ✅ | AppHeader el-select |
 
 #### 3.1.2 Element Plus 最佳实践优化
 ✅ **已完成以下优化**：
@@ -170,15 +174,20 @@ interface CharacterStats {
 }
 
 interface TaskStatus {
+  // 任务状态（布尔型）
   crusade: boolean           // 讨伐战
-  awakening: boolean         // 觉醒战
-  shop: boolean              // 商店
-  energyExchange: boolean    // 奥德兑换
-  signin: boolean            // 每日签到
-  abyssOrder: boolean        // 深渊指令书
-  localOrder: boolean        // 本地指令书
-  sanctuaryReward: boolean   // 圣域奖励
+  awakening: boolean        // 觉醒战
+  shop: boolean             // 商店
+  energyExchange: boolean  // 奥德兑换
+  signin: boolean          // 每日签到
+  dailyQuest: boolean       // 每日任务
+  abyssCorridor: boolean   // 深渊回廊
+  abyssOrder: boolean      // 深渊指令书
+  localOrder: boolean      // 本地指令书
+  sanctuaryReward: boolean  // 圣域奖励
   sanctuaryChallenge: boolean // 圣域挑战
+  ludrelle: boolean        // 卢德莱
+  purify: boolean          // 净化所
 }
 ```
 
@@ -234,7 +243,7 @@ interface TaskStatus {
 
 #### 3.1.7 账号系统 ⭐NEW
 
-**概述**：噩梦挑战、树古庆典、每日副本是账号维度数据，所有角色共享。
+**概述**：噩梦挑战、树古庆典、每日副本、商店奥德、转换奥德是账号维度数据，所有角色共享。
 
 **数据模型**：
 ```typescript
@@ -254,22 +263,47 @@ interface AccountData {
   nightmareExtra: number      // 补充次数
   nightmareMax: number       // 基本上限(14)
   nightmareExtraMax: number   // 补充上限(30)
+  // 深渊指令书
+  abyssOrderCompleted: boolean  // 完成状态（布尔型）
+  // 本地指令书
+  weeklyMissionRuns: number    // 本周完成次数
+  weeklyMissionMax: number     // 本周上限(12)
+  // 每日使命
+  dailyMissionRuns: number     // 今日完成次数
+  dailyMissionMax: number      // 今日上限(5)
+  // 商店奥德
+  shopRuns: number            // 当前完成次数
+  shopMax: number             // 上限(20)
+  // 转换奥德
+  exchangeRuns: number        // 当前完成次数
+  exchangeMax: number         // 上限(20)
 }
 
 interface Account {
   id: string
   name: string                 // 账号名称
+  race: string                // 种族
   server: string              // 服务器
   data: AccountData           // 账号维度数据
 }
 ```
+
+**完成状态判定逻辑**：
+| 数据类型 | 判定条件 | 说明 |
+|---------|---------|------|
+| 每日副本 | runs === 0 | 清空=完成 |
+| 每日使命 | runs === 0 | 清空=完成 |
+| 本地指令书 | runs === 0 | 清空=完成 |
+| 深渊指令书 | abyssOrderCompleted === true | 布尔型 |
+| 商店奥德 | runs === 0 | 清空=完成 |
+| 转换奥德 | runs === 0 | 清空=完成 |
 
 **账号数据栏 (AccountBar.vue)**：
 - 位置：页面顶部，账号数据栏独立一行
 - 功能：
   - 账号选择下拉框
   - 新增账号按钮
-  - 三个账号维度数据并排显示
+  - 全部账号视图（可编辑任意账号数据）
   - 点击数据格可编辑
   - 一键清空按钮
   - 清空后模块变为浅绿色
@@ -536,6 +570,24 @@ npm run preview
 ---
 
 ## 十三、更新日志
+
+### v0.3.0 (2026-04-25) - Shop/Exchange & UI Refinements
+- **账号系统增强**
+  - 新增商店奥德字段 (shopRuns, shopMax)
+  - 新增转换奥德字段 (exchangeRuns, exchangeMax)
+  - 商店奥德/转换奥德编辑形式（点击编辑+清空按钮）
+  - 商店奥德/转换奥德完成逻辑：runs=0视为完成
+- **统计面板增强**
+  - 新增商店奥德统计卡片
+  - 新增转换奥德统计卡片
+  - 响应式布局：flex-wrap换行，自适应宽度
+- **UI优化**
+  - 夜间模式CSS变量优化
+  - Element Plus深色模式覆盖
+  - 会员到期时间中文日历 (zh-CN)
+  - 服务器选择CN/KR独立el-select控件
+- **数据存储**
+  - localStorage键名更新为a2cms_v2防混淆
 
 ### v0.2.0 (2026-04-22) - UI Redesign
 - **整体UI重构**
