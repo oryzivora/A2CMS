@@ -136,7 +136,7 @@
           <span class="runs-max">{{ character.maxRuns }}</span>
         </div>
         <div class="runs-final">
-          最终首领消灭: {{ character.finalRuns }}/{{ character.maxFinalRuns }}
+          最终首领: {{ character.finalRuns }}<span class="runs-plus">(+{{ character.extraFinalRuns }})</span>/{{ character.maxFinalRuns }}
         </div>
       </div>
 
@@ -150,7 +150,7 @@
           <span class="runs-max">{{ character.maxTranscendRuns }}</span>
         </div>
         <div class="runs-final">
-          最终首领消灭: {{ character.transcendFinalRuns }}/{{ character.maxTranscendFinalRuns }}
+          最终首领: {{ character.transcendFinalRuns }}<span class="runs-plus">(+{{ character.extraTranscendFinalRuns }})</span>/{{ character.maxTranscendFinalRuns }}
         </div>
       </div>
     </div>
@@ -204,7 +204,7 @@
           <span class="runs-current">{{ character.nightmareRuns }}</span>
           <span class="runs-plus">(+{{ character.nightmareExtra }})</span>
           <span class="runs-sep">/</span>
-          <span class="runs-max">{{ character.nightmareMax }}</span>
+          <span class="runs-max">14</span>
         </div>
       </div>
     </div>
@@ -311,16 +311,21 @@
     <!-- 远征编辑弹窗 -->
     <el-dialog v-model="showRunsEditDialog" title="编辑远征" width="320px" @click.stop>
       <el-form label-width="100px">
-        <el-form-item label="当前次数">
+        <el-form-item label="奖励次数">
           <el-input-number v-model="editRunsForm.runs" :min="0" :max="props.character.maxRuns" controls-position="right" />
           <span class="form-unit"> / {{ props.character.maxRuns }}</span>
         </el-form-item>
         <el-form-item label="补充次数">
-          <el-input-number v-model="editRunsForm.extraRuns" :min="0" controls-position="right" />
+          <el-input-number v-model="editRunsForm.extraRuns" :min="0" :max="10" controls-position="right" />
+          <span class="form-unit"> / 10</span>
         </el-form-item>
         <el-form-item label="最终消灭">
           <el-input-number v-model="editRunsForm.finalRuns" :min="0" :max="props.character.maxFinalRuns" controls-position="right" />
           <span class="form-unit"> / {{ props.character.maxFinalRuns }}</span>
+        </el-form-item>
+        <el-form-item label="最终补充">
+          <el-input-number v-model="editRunsForm.extraFinalRuns" :min="0" :max="10" controls-position="right" />
+          <span class="form-unit"> / 10</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -332,16 +337,21 @@
     <!-- 超越编辑弹窗 -->
     <el-dialog v-model="showTranscendEditDialog" title="编辑超越" width="320px" @click.stop>
       <el-form label-width="100px">
-        <el-form-item label="当前次数">
-          <el-input-number v-model="editTranscendForm.transcendRuns" :min="0" :max="props.character.maxTranscendRuns" controls-position="right" />
-          <span class="form-unit"> / {{ props.character.maxTranscendRuns }}</span>
+        <el-form-item label="奖励次数">
+          <el-input-number v-model="editTranscendForm.transcendRuns" :min="0" :max="7" controls-position="right" />
+          <span class="form-unit"> / 7</span>
         </el-form-item>
         <el-form-item label="补充次数">
-          <el-input-number v-model="editTranscendForm.extraTranscendRuns" :min="0" controls-position="right" />
+          <el-input-number v-model="editTranscendForm.extraTranscendRuns" :min="0" :max="10" controls-position="right" />
+          <span class="form-unit"> / 10</span>
         </el-form-item>
         <el-form-item label="最终消灭">
-          <el-input-number v-model="editTranscendForm.transcendFinalRuns" :min="0" :max="props.character.maxTranscendFinalRuns" controls-position="right" />
-          <span class="form-unit"> / {{ props.character.maxTranscendFinalRuns }}</span>
+          <el-input-number v-model="editTranscendForm.transcendFinalRuns" :min="0" :max="28" controls-position="right" />
+          <span class="form-unit"> / 28</span>
+        </el-form-item>
+        <el-form-item label="最终补充">
+          <el-input-number v-model="editTranscendForm.extraTranscendFinalRuns" :min="0" :max="10" controls-position="right" />
+          <span class="form-unit"> / 10</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -357,13 +367,13 @@
           <el-input-number v-model="editLudrelleForm.ludrelleRuns" :min="0" :max="4" controls-position="right" />
         </el-form-item>
         <el-form-item label="挑战补充">
-          <el-input-number v-model="editLudrelleForm.ludrelleExtra" :min="0" controls-position="right" />
+          <el-input-number v-model="editLudrelleForm.ludrelleExtra" :min="0" :max="10" controls-position="right" />
         </el-form-item>
         <el-form-item label="奖励当前">
           <el-input-number v-model="editLudrelleForm.ludrelleRewardRuns" :min="0" :max="2" controls-position="right" />
         </el-form-item>
         <el-form-item label="奖励补充">
-          <el-input-number v-model="editLudrelleForm.ludrelleRewardExtra" :min="0" controls-position="right" />
+          <el-input-number v-model="editLudrelleForm.ludrelleRewardExtra" :min="0" :max="10" controls-position="right" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -379,13 +389,13 @@
           <el-input-number v-model="editPurifyForm.purifyRuns" :min="0" :max="4" controls-position="right" />
         </el-form-item>
         <el-form-item label="挑战补充">
-          <el-input-number v-model="editPurifyForm.purifyExtra" :min="0" controls-position="right" />
+          <el-input-number v-model="editPurifyForm.purifyExtra" :min="0" :max="10" controls-position="right" />
         </el-form-item>
         <el-form-item label="奖励当前">
           <el-input-number v-model="editPurifyForm.purifyRewardRuns" :min="0" :max="2" controls-position="right" />
         </el-form-item>
         <el-form-item label="奖励补充">
-          <el-input-number v-model="editPurifyForm.purifyRewardExtra" :min="0" controls-position="right" />
+          <el-input-number v-model="editPurifyForm.purifyRewardExtra" :min="0" :max="10" controls-position="right" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -398,11 +408,12 @@
     <el-dialog v-model="showNightmareEditDialog" title="编辑噩梦挑战" width="320px" @click.stop>
       <el-form label-width="100px">
         <el-form-item label="挑战当前">
-          <el-input-number v-model="editNightmareForm.nightmareRuns" :min="0" :max="props.character.nightmareMax" controls-position="right" />
-          <span class="form-unit"> / {{ props.character.nightmareMax }}</span>
+          <el-input-number v-model="editNightmareForm.nightmareRuns" :min="0" :max="14" controls-position="right" />
+          <span class="form-unit"> / 14</span>
         </el-form-item>
         <el-form-item label="补充次数">
-          <el-input-number v-model="editNightmareForm.nightmareExtra" :min="0" controls-position="right" />
+          <el-input-number v-model="editNightmareForm.nightmareExtra" :min="0" :max="30" controls-position="right" />
+          <span class="form-unit"> / 30</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -426,7 +437,7 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit } from '@element-plus/icons-vue'
 import { CircleCheck, CircleClose } from '@element-plus/icons-vue'
 import { useCharacterStore, useGroupStore, useTeamStore, useUIStore } from '@/stores'
@@ -480,13 +491,15 @@ const editKinaForm = ref({
 const editRunsForm = ref({
   runs: 0,
   extraRuns: 0,
-  finalRuns: 0
+  finalRuns: 0,
+  extraFinalRuns: 0
 })
 
 const editTranscendForm = ref({
   transcendRuns: 0,
   extraTranscendRuns: 0,
-  transcendFinalRuns: 0
+  transcendFinalRuns: 0,
+  extraTranscendFinalRuns: 0
 })
 
 const editLudrelleForm = ref({
@@ -513,7 +526,9 @@ const editNotesForm = ref({
 })
 
 const displayTasks = computed(() => {
-  return showAllTasks.value ? taskList : taskList.slice(0, 0)
+  // 过滤掉卢德莱和净化所（它们在卡片中有独立模块）
+  const filteredTasks = taskList.filter((t: any) => t.key !== 'ludrelle' && t.key !== 'purify')
+  return showAllTasks.value ? filteredTasks : filteredTasks.slice(0, 0)
 })
 
 const showTasks = computed(() => uiStore.settings.showTasks)
@@ -549,8 +564,16 @@ const handleEdit = () => {
 }
 
 const handleDelete = () => {
-  characterStore.deleteCharacter(props.character.id)
-  ElMessage.success('角色已删除')
+  ElMessageBox.confirm('确定要删除该角色吗？删除后将无法恢复。', '删除确认', {
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    characterStore.deleteCharacter(props.character.id)
+    ElMessage.success('角色已删除')
+  }).catch(() => {
+    // 取消删除
+  })
 }
 
 const handleRunsChange = (delta: number) => {
@@ -708,7 +731,8 @@ const openRunsEditDialog = () => {
   editRunsForm.value = {
     runs: props.character.runs,
     extraRuns: props.character.extraRuns,
-    finalRuns: props.character.finalRuns
+    finalRuns: props.character.finalRuns,
+    extraFinalRuns: props.character.extraFinalRuns
   }
   showRunsEditDialog.value = true
 }
@@ -718,7 +742,8 @@ const confirmRunsEdit = () => {
   characterStore.updateCharacter(props.character.id, {
     runs: editRunsForm.value.runs,
     extraRuns: editRunsForm.value.extraRuns,
-    finalRuns: editRunsForm.value.finalRuns
+    finalRuns: editRunsForm.value.finalRuns,
+    extraFinalRuns: editRunsForm.value.extraFinalRuns
   })
   showRunsEditDialog.value = false
   ElMessage.success('远征已更新')
@@ -729,7 +754,8 @@ const openTranscendEditDialog = () => {
   editTranscendForm.value = {
     transcendRuns: props.character.transcendRuns,
     extraTranscendRuns: props.character.extraTranscendRuns,
-    transcendFinalRuns: props.character.transcendFinalRuns
+    transcendFinalRuns: props.character.transcendFinalRuns,
+    extraTranscendFinalRuns: props.character.extraTranscendFinalRuns
   }
   showTranscendEditDialog.value = true
 }
@@ -739,7 +765,8 @@ const confirmTranscendEdit = () => {
   characterStore.updateCharacter(props.character.id, {
     transcendRuns: editTranscendForm.value.transcendRuns,
     extraTranscendRuns: editTranscendForm.value.extraTranscendRuns,
-    transcendFinalRuns: editTranscendForm.value.transcendFinalRuns
+    transcendFinalRuns: editTranscendForm.value.transcendFinalRuns,
+    extraTranscendFinalRuns: editTranscendForm.value.extraTranscendFinalRuns
   })
   showTranscendEditDialog.value = false
   ElMessage.success('超越已更新')
@@ -913,13 +940,16 @@ const confirmNotesEdit = () => {
 
 /* 能量 */
 .energy-section {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: var(--el-fill-color-light);
-  border-radius: 8px;
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  background: var(--bg-hover);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.energy-section:hover {
+  box-shadow: var(--shadow-sm);
 }
 
 /* 基纳 */

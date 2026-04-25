@@ -248,6 +248,7 @@ import { ref, computed, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, ArrowDown } from '@element-plus/icons-vue'
 import { useCharacterStore, useGroupStore, useTeamStore, useUIStore, useBackupStore, useAccountStore } from '@/stores'
+import { taskList } from '@/dict'
 import type { Character, TaskStatus, LayoutMode } from '@/types'
 
 // 子组件
@@ -293,31 +294,11 @@ watch(() => accountStore.filterAccountId, (newFilterId) => {
   characterStore.setFilters({ accountId: newFilterId })
 }, { immediate: true })
 
-// 任务列表
-const taskList = [
-  { key: 'crusade' as const, short: '讨' },
-  { key: 'awakening' as const, short: '觉' },
-  { key: 'shop' as const, short: '商' },
-  { key: 'signin' as const, short: '签' },
-  { key: 'energyExchange' as const, short: '兑' },
-]
-
-// 表格模式显示的所有任务
-const allTableTasks = [
-  { key: 'signin' as const, short: '签' },
-  { key: 'dailyQuest' as const, short: '日' },
-  { key: 'abyssCorridor' as const, short: '回' },
-  { key: 'awakening' as const, short: '觉' },
-  { key: 'localOrder' as const, short: '本' },
-  { key: 'abyssOrder' as const, short: '深' },
-  { key: 'ludrelle' as const, short: '卢' },
-  { key: 'purify' as const, short: '净' },
-]
-
-// 获取已激活的任务
-const getActiveTasks = (tasks: TaskStatus) => {
-  return taskList.filter(t => tasks[t.key])
-}
+// 表格模式显示的所有任务（与角色卡片任务同步，过滤掉卢德莱和净化所）
+const allTableTasks = taskList.filter((t: any) => t.key !== 'ludrelle' && t.key !== 'purify').map((t: any) => ({
+  key: t.key,
+  short: t.label.substring(0, 1)
+}))
 
 // 排序后的角色
 const sortedCharacters = computed(() => {

@@ -62,16 +62,8 @@ export const defaultGroups = [
 // 任务列表
 export const taskList = [
   { key: 'signin', label: '每日签到' },
-  { key: 'dailyQuest', label: '每日任务' },
   { key: 'abyssCorridor', label: '深渊回廊' },
   { key: 'awakening', label: '觉醒战' },
-  { key: 'abyssOrder', label: '深渊指令书' },
-  { key: 'localOrder', label: '本地指令书' },
   { key: 'ludrelle', label: '卢德莱' },
   { key: 'purify', label: '净化所' }
-  // { key: 'crusade', label: '讨伐战' },
-  // { key: 'shop', label: '商店' },
-  // { key: 'energyExchange', label: '奥德兑换' },
-  // { key: 'sanctuaryReward', label: '圣域奖励' },
-  // { key: 'sanctuaryChallenge', label: '圣域挑战' }
 ]

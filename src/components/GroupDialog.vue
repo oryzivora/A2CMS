@@ -33,7 +33,17 @@
         placeholder="新分组名称" 
         style="width: 200px;" 
       />
-      <el-color-picker v-model="newGroupColor" />
+      <el-color-picker v-if="false" v-model="newGroupColor" />
+      <div class="color-picker">
+        <span
+          v-for="color in basicColors"
+          :key="color"
+          class="color-option"
+          :class="{ 'is-selected': newGroupColor === color }"
+          :style="{ backgroundColor: color }"
+          @click="newGroupColor = color"
+        />
+      </div>
       <el-button type="primary" @click="handleAdd">添加</el-button>
     </div>
   </el-dialog>
@@ -56,6 +66,18 @@ const emit = defineEmits<{
 const groupStore = useGroupStore()
 const newGroupName = ref('')
 const newGroupColor = ref('#409EFF')
+
+// 基础颜色选项
+const basicColors = [
+  '#409EFF', // 蓝色
+  '#67C23A', // 绿色
+  '#E6A23C', // 黄色
+  '#F56C6C', // 红色
+  '#909399', // 灰色
+  '#B37FEB', // 紫色
+  '#36D7B7', // 青色
+  '#FF9F43', // 橙色
+]
 
 const handleAdd = () => {
   if (newGroupName.value.trim()) {
@@ -101,5 +123,29 @@ const handleDelete = (id: string) => {
   padding: 12px;
   background: var(--el-fill-color-light);
   border-radius: 8px;
+}
+
+.color-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.is-selected {
+  border-color: var(--el-text-color-primary);
+  box-shadow: 0 0 0 2px var(--el-color-white);
 }
 </style>

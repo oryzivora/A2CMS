@@ -104,56 +104,108 @@
   --transition-slow: 350ms ease;
 }
 
-/* Night Theme - Dark Mode */
+/* Night Theme - Dark Mode (Optimized) */
 [data-theme="night"] {
-  /* Background Colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-card: #1e293b;
-  --bg-hover: #273548;
-  --bg-active: #2d3f59;
+  /* Background Colors - Better contrast hierarchy */
+  --bg-primary: #0a0e14;
+  --bg-secondary: #111827;
+  --bg-card: #151c28;
+  --bg-hover: #1c2638;
+  --bg-active: #243048;
 
-  /* Text Colors */
-  --text-primary: #f1f5f9;
-  --text-regular: #cbd5e1;
-  --text-secondary: #94a3b8;
-  --text-placeholder: #64748b;
-  --text-muted: #475569;
+  /* Text Colors - Higher contrast for readability */
+  --text-primary: #f8fafc;
+  --text-regular: #e2e8f0;
+  --text-secondary: #a8b8cc;
+  --text-placeholder: #6b7f99;
+  --text-muted: #4a5568;
 
-  /* Brand Colors - Adjusted for dark */
-  --primary: #60a5fa;
-  --primary-hover: #93c5fd;
-  --primary-light: #1e3a5f;
-  --primary-dark: #3b82f6;
+  /* Brand Colors - Brighter for dark backgrounds */
+  --primary: #3b9eff;
+  --primary-hover: #60a5fa;
+  --primary-light: #1a3050;
+  --primary-dark: #2563eb;
 
-  /* Semantic Colors - Adjusted */
-  --success: #34d399;
-  --success-light: #064e3b;
-  --warning: #fbbf24;
-  --warning-light: #451a03;
-  --danger: #f87171;
-  --danger-light: #450a0a;
-  --info: #a1a1aa;
-  --info-light: #27272a;
+  /* Semantic Colors - Vibrant but not harsh */
+  --success: #22c55e;
+  --success-light: #052e16;
+  --warning: #f59e0b;
+  --warning-light: #2d1c06;
+  --danger: #ef4444;
+  --danger-light: #2d0a0a;
+  --info: #94a3b8;
+  --info-light: #1e293b;
 
-  /* Gold Accent - Adjusted for dark */
-  --accent: #fbbf24;
-  --accent-hover: #f59e0b;
-  --accent-light: rgba(251, 191, 36, 0.15);
-  --accent-bg: rgba(251, 191, 36, 0.08);
+  /* Gold Accent - Matches dark theme better */
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-light: rgba(245, 158, 11, 0.12);
+  --accent-bg: rgba(245, 158, 11, 0.06);
 
-  /* Border Colors */
-  --border-base: #334155;
-  --border-light: #3d4a63;
-  --border-lighter: #475569;
-  --border-hover: #64748b;
+  /* Border Colors - Subtle, not competing */
+  --border-base: #1e293b;
+  --border-light: #253348;
+  --border-lighter: #2d3f5a;
+  --border-hover: #475569;
 
-  /* Shadows - Darker */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Shadows - Subtle depth */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Mode Additional Enhancements */
+[data-theme="night"] {
+  /* Card glow effect for better depth */
+  --card-glow: 0 0 20px rgba(59, 158, 255, 0.05);
+
+  /* Element Plus Dropdown/Select */
+  --el-dropdown-menu-box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --el-dropdown-menuBackground-color: var(--bg-card);
+  --el-dropdown-menuItem-hover-fill: var(--bg-hover);
+  --el-dropdown-menuItem-hover-color: var(--text-primary);
+
+  /* Element Plus Select Dropdown */
+  --el-select-dropdown-background-color: var(--bg-card);
+  --el-select-dropdown-box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --el-select-option-hover-background-color: var(--bg-hover);
+  --el-select-dropdown-border-color: var(--border-base);
+  --el-select-input-focus-border-color: var(--primary);
+
+  /* Element Plus Input/Select */
+  --el-input-background-color: var(--bg-card);
+  --el-input-border-color: var(--border-base);
+  --el-input-hover-border-color: var(--border-hover);
+  --el-input-fill: var(--bg-card);
+  --el-input-focus-border-color: var(--el-color-primary);
+  --el-select-multi-input-border-color: var(--border-base);
+  --el-select-input-border-color: var(--border-base);
+  --el-select-input-focus-border-color: var(--el-color-primary);
+
+  /* Element Plus Popper */
+  --el-popover-background-color: var(--bg-card);
+  --el-popover-border-color: var(--border-base);
+  --el-popper-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+
+  /* Element Plus Dialog/Modal */
+  --el-dialog-background-color: var(--bg-card);
+
+  /* Element Plus DatePicker */
+  --el-datepicker-off-text-color: var(--text-placeholder);
+  --el-datepicker-header-text-color: var(--text-primary);
+  --el-datepicker-text-color: var(--text-regular);
+  --el-datepicker-inner-border-color: var(--border-light);
+
+  /* Element Plus Button */
+  --el-button-hover-bg-color: var(--bg-hover);
+  --el-button-active-bg-color: var(--bg-active);
+
+  /* Element Plus Tag */
+  --el-tag-bg-color: var(--bg-secondary);
+  --el-tag-border-color: var(--border-base);
+  --el-tag-text-color: var(--text-regular);
 }
 
 /* ========================================
@@ -200,7 +252,7 @@ body {
   --el-hover-bg-color: var(--bg-hover);
 }
 
-/* Dark Mode Element Plus */
+/* Dark Mode Element Plus - Extended */
 [data-theme="night"] {
   --el-color-primary: var(--primary);
   --el-color-primary-light-3: var(--primary-light);
@@ -213,6 +265,13 @@ body {
   --el-fill-color-blank: var(--bg-card);
   --el-bg-color: var(--bg-secondary);
   --el-hover-bg-color: var(--bg-hover);
+  --el-fill-color: var(--bg-hover);
+  --el-fill-color-light: var(--bg-secondary);
+  --el-mask-color: rgba(0, 0, 0, 0.7);
+  --el-color-danger: var(--danger);
+  --el-color-success: var(--success);
+  --el-color-warning: var(--warning);
+  --el-color-info: var(--info);
 }
 
 /* ========================================
@@ -266,5 +325,112 @@ body {
 @media (min-width: 1920px) {
   :root {
     --font-size-base: 15px;
+  }
+}
+
+/* ========================================
+   Element Plus Dark Mode Overrides
+   Direct selectors for components
+   ======================================== */
+
+[data-theme="night"] {
+  /* el-select dropdown */
+  .el-select-dropdown,
+  .el-select-dropdown__empty {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-base);
+  }
+
+  .el-select-dropdown__item {
+    background-color: var(--bg-card);
+    color: var(--text-regular);
+  }
+
+  .el-select-dropdown__item:hover,
+  .el-select-dropdown__item.hover {
+    background-color: var(--bg-hover) !important;
+  }
+
+  .el-select-dropdown__item.selected {
+    color: var(--primary);
+    background-color: var(--primary-light) !important;
+  }
+
+  /* el-select input */
+  .el-select .el-input__wrapper {
+    background-color: var(--bg-card) !important;
+    box-shadow: 0 0 0 1px var(--border-base) inset;
+  }
+
+  .el-select .el-input__wrapper:hover {
+    box-shadow: 0 0 0 1px var(--border-hover) inset;
+  }
+
+  .el-select .el-input__wrapper.is-focus {
+    box-shadow: 0 0 0 1px var(--primary) inset !important;
+  }
+
+  /* el-input */
+  .el-input__wrapper {
+    background-color: var(--bg-card) !important;
+  }
+
+  /* el-dropdown-menu */
+  .el-dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-base);
+  }
+
+  .el-dropdown-menu__item {
+    color: var(--text-regular);
+  }
+
+  .el-dropdown-menu__item:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  /* el-popper dropdown */
+  .el-popper.is-dark {
+    background-color: var(--bg-card);
+    border-color: var(--border-base);
+  }
+
+  .el-popper__arrow {
+    background-color: var(--bg-card);
+  }
+
+  /* el-date-picker */
+  .el-date-editor {
+    --el-date-editor-width: 100%;
+  }
+
+  .el-picker__popper {
+    background-color: var(--bg-card);
+    border-color: var(--border-base);
+  }
+
+  .el-date-table td.current:not(.disabled) .el-date-table-cell__text {
+    background-color: var(--primary);
+  }
+
+  /* el-option */
+  .el-option {
+    background-color: var(--bg-card);
+  }
+
+  .el-option:hover,
+  .el-option.hover {
+    background-color: var(--bg-hover);
+  }
+
+  .el-option.is-selected {
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  /* Fix for select in header */
+  .header-right .el-select .el-input__wrapper {
+    background-color: var(--bg-secondary) !important;
   }
 }
