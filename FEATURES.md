@@ -1,6 +1,6 @@
 # A2CMS 功能文档
 
-> Aion2 Character Management System - 永恒之塔角色管理系统
+> Aion2 Character Management System - 永恒之塔2角色管理系统
 
 ## 📝 文档说明
 此文档用于记录 A2CMS 项目的所有功能需求、设计决策和实现细节。
@@ -14,7 +14,7 @@
 **A2CMS** (Aion2 Character Management System)
 
 ### 1.2 项目目标
-为《永恒之塔》(Aion2) 游戏玩家提供**多账号、多角色**的集中管理平台，跟踪游戏资源、优化游戏体验。
+为《永恒之塔2》(Aion2) 游戏玩家提供**多账号、多角色**的集中管理平台，跟踪游戏资源、优化游戏体验。
 
 ### 1.3 目标用户
 - 多账号搬砖玩家
