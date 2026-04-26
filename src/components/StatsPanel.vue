@@ -428,51 +428,38 @@ const progressColor = (percentage: number) => {
   margin-bottom: var(--space-4);
 }
 
-/* 卡片行 - 响应式布局 */
+/* 卡片行 - 单行布局（不换行） */
 .cards-flex {
   display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+  overflow-x: auto;
   justify-content: flex-start;
 }
 
 .cards-flex :deep(.el-card) {
-  flex: 1 1 calc(16% - var(--space-3));
-  min-width: 140px;
-  max-width: 200px;
+  flex: 0 0 calc(12% - var(--space-2));
+  min-width: 110px;
+  max-width: 140px;
 }
 
-/* 响应式调整 */
-@media (max-width: 1400px) {
-  .cards-flex :deep(.el-card) {
-    flex: 1 1 calc(20% - var(--space-3));
-    min-width: 130px;
-    max-width: 180px;
-  }
+/* 响应式调整 - 隐藏滚动条但保持滚动 */
+.cards-flex::-webkit-scrollbar {
+  height: 4px;
 }
 
-@media (max-width: 1200px) {
-  .cards-flex :deep(.el-card) {
-    flex: 1 1 calc(25% - var(--space-3));
-    min-width: 120px;
-    max-width: 160px;
-  }
+.cards-flex::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 2px;
 }
 
-@media (max-width: 900px) {
-  .cards-flex :deep(.el-card) {
-    flex: 1 1 calc(33.333% - var(--space-3));
-    min-width: 110px;
-    max-width: 150px;
-  }
+.cards-flex::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 2px;
 }
 
-@media (max-width: 600px) {
-  .cards-flex :deep(.el-card) {
-    flex: 1 1 calc(50% - var(--space-3));
-    min-width: 100px;
-    max-width: 140px;
-  }
+.cards-flex::-webkit-scrollbar-thumb:hover {
+  background: var(--border-base);
 }
 
 /* 卡片样式 */
