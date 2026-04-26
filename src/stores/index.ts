@@ -761,6 +761,43 @@ function getThisWednesday5Timestamp(serverRegion: 'cn' | 'kr'): number {
 }
 
 /**
+ * 获取最近一次深渊回廊重置时间戳 (周三/周六22:00，国服)
+ * 韩服提前1小时为21:00
+ */
+function getRecentAbyssCorridorResetTimestamp(serverRegion: 'cn' | 'kr'): number {
+  const resetHour = serverRegion === 'kr' ? 21 : 22 // 韩服21:00，国服22:00
+  const serverTime = getServerTime(serverRegion)
+  const today = new Date(serverTime)
+  const dayOfWeek = today.getDay()
+
+  // 计算距今天数：周三=3，周六=6
+  const daysToWednesday = (3 - dayOfWeek + 7) % 7
+  const daysToSaturday = (6 - dayOfWeek + 7) % 7
+
+  // 生成本周三和周六的时间戳
+  const thisWednesday = new Date(serverTime)
+  thisWednesday.setDate(today.getDate() + daysToWednesday)
+  thisWednesday.setHours(resetHour, 0, 0, 0)
+
+  const thisSaturday = new Date(serverTime)
+  thisSaturday.setDate(today.getDate() + daysToSaturday)
+  thisSaturday.setHours(resetHour, 0, 0, 0)
+
+  // 返回最近的一个（如果都已过，返回下周）
+  const now = serverTime.getTime()
+  if (thisWednesday.getTime() > now) {
+    return thisWednesday.getTime() - SERVER_TIME_OFFSET[serverRegion] * 60 * 60 * 1000
+  }
+  if (thisSaturday.getTime() > now) {
+    return thisSaturday.getTime() - SERVER_TIME_OFFSET[serverRegion] * 60 * 60 * 1000
+  }
+  // 如果都过了，返回下周周三
+  const nextWednesday = new Date(thisWednesday)
+  nextWednesday.setDate(nextWednesday.getDate() + 7)
+  return nextWednesday.getTime() - SERVER_TIME_OFFSET[serverRegion] * 60 * 60 * 1000
+}
+
+/**
  * 计算能量恢复
  * @param lastRecoveryTime 上次恢复时间戳
  * @param currentEnergy 当前能量
@@ -787,60 +824,30 @@ function calculateEnergyRecovery(
 }
 
 /**
- * 计算每日重置恢复次数
- * @param lastResetTime 上次重置时间戳
- * @param currentRuns 当前次数
- * @param maxRuns 最大次数
- * @param resetHours 重置小时数组 [5, 17]
- * @param serverRegion 服务器区域
- * @param perResetAmount 每次恢复数量
- * @returns 恢复后的次数
- */
-function calculateDailyReset(
-  lastResetTime: number,
-  currentRuns: number,
-  maxRuns: number,
-  resetHours: number[],
-  serverRegion: 'cn' | 'kr',
-  perResetAmount: number = 1
-): number {
-  if (currentRuns >= maxRuns) return currentRuns
-  
-  const now = Date.now()
-  let resetCount = 0
-  
-  for (const hour of resetHours) {
-    const resetTimestamp = getTodayTimestampAtHour(hour, serverRegion)
-    if (resetTimestamp > lastResetTime && resetTimestamp <= now) {
-      resetCount++
-    }
-    // 检查昨天的重置(如果上次访问是昨天)
-    const yesterdayReset = resetTimestamp - 24 * 60 * 60 * 1000
-    if (yesterdayReset > lastResetTime && yesterdayReset <= now) {
-      resetCount++
-    }
-  }
-  
-  return Math.min(currentRuns + resetCount * perResetAmount, maxRuns)
-}
-
-/**
  * 应用所有定时任务重置
  */
 export function applyScheduledResets(): void {
   const uiStore = useUIStore()
   const charStore = useCharacterStore()
   const accountStore = useAccountStore()
-  
+
   const now = Date.now()
   const serverRegion = uiStore.settings.serverRegion
-  const lastVisit = uiStore.settings.lastVisitTime
-  
+
+  // 验证时间戳的合理性（防止时钟回拨导致的问题）
+  const validateTimestamp = (ts: number, fallback: number): number => {
+    if (ts <= 0 || ts > now + 60 * 1000) return fallback // 如果时间戳无效或在未来超过1分钟，使用fallback
+    return ts
+  }
+
+  const lastVisit = validateTimestamp(uiStore.settings.lastVisitTime, now - 60 * 1000)
+  const lastEnergyRecoveryTime = validateTimestamp(uiStore.settings.lastEnergyRecoveryTime, now - 60 * 1000)
+  const lastDailyResetTime = validateTimestamp(uiStore.settings.lastDailyResetTime, now - 60 * 1000)
+  const lastWeeklyResetTime = validateTimestamp(uiStore.settings.lastWeeklyResetTime, now - 60 * 1000)
+
   // 如果距离上次访问不足1分钟,跳过
   if (now - lastVisit < 60 * 1000) return
-  
-  const { lastEnergyRecoveryTime, lastDailyResetTime, lastWeeklyResetTime } = uiStore.settings
-  
+
   // 1. 能量恢复 (每3小时)
   if (now - lastEnergyRecoveryTime >= RESET_CONFIG.energyIntervalHours * 60 * 60 * 1000) {
     charStore.characters.forEach(char => {
@@ -853,53 +860,79 @@ export function applyScheduledResets(): void {
     })
     uiStore.settings.lastEnergyRecoveryTime = now
   }
-  
-  // 2. 每日重置 (5:00 和 17:00) - 远征、超越、噩梦、树古
-  const dailyResetHours = [5, 17]
-  let needsDailyReset = false
-  
-  for (const hour of dailyResetHours) {
-    const resetTimestamp = getTodayTimestampAtHour(hour, serverRegion)
-    if (resetTimestamp > lastDailyResetTime && resetTimestamp <= now) {
-      needsDailyReset = true
-      break
-    }
-    const yesterdayReset = resetTimestamp - 24 * 60 * 60 * 1000
-    if (yesterdayReset > lastDailyResetTime && yesterdayReset <= now) {
-      needsDailyReset = true
-      break
-    }
+
+  // 2. 每日使命重置 (0:00)
+  const today0Timestamp = getTodayTimestampAtHour(0, serverRegion)
+  const yesterday0Timestamp = today0Timestamp - 24 * 60 * 60 * 1000
+  if (!uiStore.settings.lastDailyMissionResetTime) {
+    uiStore.settings.lastDailyMissionResetTime = lastVisit
   }
-  
-  if (needsDailyReset) {
+  if (today0Timestamp > uiStore.settings.lastDailyMissionResetTime && today0Timestamp <= now) {
+    // 每日使命重置
+    accountStore.accounts.forEach(account => {
+      account.data.dailyMissionRuns = account.data.dailyMissionMax
+    })
+    uiStore.settings.lastDailyMissionResetTime = now
+  } else if (yesterday0Timestamp > uiStore.settings.lastDailyMissionResetTime && yesterday0Timestamp <= now) {
+    // 昨天0点的重置也处理
+    accountStore.accounts.forEach(account => {
+      account.data.dailyMissionRuns = account.data.dailyMissionMax
+    })
+    uiStore.settings.lastDailyMissionResetTime = now
+  }
+
+  // 3. 每日重置
+  //   5:00 - 远征、超越、噩梦、树古
+  //   17:00 - 远征、超越
+  // 检查5:00重置（远征、超越、噩梦、树古）
+  const morningResetTimestamp = getTodayTimestampAtHour(5, serverRegion)
+  const yesterdayMorningReset = morningResetTimestamp - 24 * 60 * 60 * 1000
+  const needsMorningReset = morningResetTimestamp > lastDailyResetTime && morningResetTimestamp <= now
+    || yesterdayMorningReset > lastDailyResetTime && yesterdayMorningReset <= now
+
+  // 检查17:00重置（仅远征、超越）
+  const eveningResetTimestamp = getTodayTimestampAtHour(17, serverRegion)
+  const yesterdayEveningReset = eveningResetTimestamp - 24 * 60 * 60 * 1000
+  const needsEveningReset = eveningResetTimestamp > lastDailyResetTime && eveningResetTimestamp <= now
+    || yesterdayEveningReset > lastDailyResetTime && yesterdayEveningReset <= now
+
+  if (needsMorningReset) {
+    // 远征次数
     charStore.characters.forEach(char => {
-      // 远征次数
       char.runs = Math.min(char.runs + 1, char.maxRuns)
-      // 超越次数
       char.transcendRuns = Math.min(char.transcendRuns + 1, char.maxTranscendRuns)
       char.updatedAt = now
     })
-    
-    // 账号维度噩梦和树古
+
+    // 账号维度噩梦和树古（仅5:00补充）
     accountStore.accounts.forEach(account => {
       const isMember = account.data.isMember
-      // 噩梦次数 +2
       account.data.nightmareRuns = Math.min(
         account.data.nightmareRuns + 2,
         account.data.nightmareMax
       )
-      // 树古次数 会员+2 非会员+1
       const shugoRecovery = isMember ? RESET_CONFIG.shugoMemberExtra : RESET_CONFIG.shugoNonMemberExtra
       account.data.shugoRuns = Math.min(
         account.data.shugoRuns + shugoRecovery,
         account.data.shugoMax
       )
     })
-    
+  }
+
+  if (needsEveningReset) {
+    // 远征次数、超越次数（17:00也补充）
+    charStore.characters.forEach(char => {
+      char.runs = Math.min(char.runs + 1, char.maxRuns)
+      char.transcendRuns = Math.min(char.transcendRuns + 1, char.maxTranscendRuns)
+      char.updatedAt = now
+    })
+  }
+
+  if (needsMorningReset || needsEveningReset) {
     uiStore.settings.lastDailyResetTime = now
   }
-  
-  // 3. 每周重置 (周三5:00)
+
+  // 4. 每周重置 (周三5:00)
   const wednesdayTimestamp = getThisWednesday5Timestamp(serverRegion)
   if (wednesdayTimestamp > lastWeeklyResetTime && wednesdayTimestamp <= now) {
     // 圣域卢德莱奖励/挑战重置
@@ -915,7 +948,7 @@ export function applyScheduledResets(): void {
       char.purifyExtra = 1
       char.updatedAt = now
     })
-    
+
     // 深渊指令书、本地指令书、觉醒战重置
     charStore.characters.forEach(char => {
       char.tasks.abyssOrder = false
@@ -923,16 +956,34 @@ export function applyScheduledResets(): void {
       char.tasks.awakening = false
       char.updatedAt = now
     })
-    
-    // 商店奥德、转换奥德重置
+
+    // 账号维度数据重置
     accountStore.accounts.forEach(account => {
+      // 商店奥德、转换奥德重置
       account.data.shopRuns = RESET_CONFIG.shopExchangeCap
       account.data.exchangeRuns = RESET_CONFIG.shopExchangeCap
+      // 每日副本次数重置为上限
+      account.data.dailyDungeonRuns = account.data.dailyDungeonMax
+      account.data.dailyDungeonExtra = account.data.dailyDungeonExtraMax
+      // 每周指令重置为上限
+      account.data.weeklyMissionRuns = account.data.weeklyMissionMax
     })
-    
+
     uiStore.settings.lastWeeklyResetTime = now
   }
-  
+
+  // 5. 深渊回廊重置 (周三/周六22:00，国服；21:00，韩服)
+  const abyssCorridorResetTime = getRecentAbyssCorridorResetTimestamp(serverRegion)
+  const lastAbyssCorridorReset = uiStore.settings.lastAbyssCorridorResetTime || lastVisit
+  // 深渊回廊重置时间已到且尚未处理
+  if (abyssCorridorResetTime > lastAbyssCorridorReset && abyssCorridorResetTime <= now) {
+    charStore.characters.forEach(char => {
+      char.tasks.abyssCorridor = false
+      char.updatedAt = now
+    })
+    uiStore.settings.lastAbyssCorridorResetTime = now
+  }
+
   // 更新最后访问时间
   uiStore.settings.lastVisitTime = now
 }

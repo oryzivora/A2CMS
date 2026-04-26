@@ -176,6 +176,8 @@ export interface UISettings {
   lastEnergyRecoveryTime: number  // 上次能量恢复时间戳
   lastDailyResetTime: number      // 上次每日重置时间戳
   lastWeeklyResetTime: number     // 上次每周重置时间戳(周三)
+  lastDailyMissionResetTime?: number // 上次每日使命重置时间戳(0:00)
+  lastAbyssCorridorResetTime?: number // 上次深渊回廊重置时间戳(周三/周六22:00)
 }
 
 // 服务器时区偏移
@@ -186,7 +188,6 @@ export const SERVER_TIME_OFFSET: Record<'cn' | 'kr', number> = {
 
 // 重置时间配置(国服时间,韩服自动-1)
 export const RESET_CONFIG = {
-  dailyHours: [5, 17],        // 每日重置时间(国服)
   weeklyDay: 3,              // 每周重置日(0=周日,3=周三)
   energyIntervalHours: 3,    // 能量恢复间隔
   energyRecoveryMember: 15,  // 会员每3小时恢复量
