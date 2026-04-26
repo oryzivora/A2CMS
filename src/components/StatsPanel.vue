@@ -438,9 +438,9 @@ const progressColor = (percentage: number) => {
 }
 
 .cards-flex :deep(.el-card) {
-  flex: 0 0 calc(12% - var(--space-2));
-  min-width: 110px;
-  max-width: 140px;
+  flex: 0 0 calc(13% - var(--space-2));
+  min-width: 120px;
+  max-width: 150px;
 }
 
 /* 响应式调整 - 隐藏滚动条但保持滚动 */
