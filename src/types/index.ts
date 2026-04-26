@@ -171,4 +171,34 @@ export interface UISettings {
   sortLocked: boolean
   themeMode: 'game' | 'eyeCare'  // 游戏主题 / 护眼模式
   serverRegion: 'cn' | 'kr'  // 服务器大区：国服/韩服
+  // 重置追踪
+  lastVisitTime: number           // 上次访问时间戳
+  lastEnergyRecoveryTime: number  // 上次能量恢复时间戳
+  lastDailyResetTime: number      // 上次每日重置时间戳
+  lastWeeklyResetTime: number     // 上次每周重置时间戳(周三)
+}
+
+// 服务器时区偏移
+export const SERVER_TIME_OFFSET: Record<'cn' | 'kr', number> = {
+  cn: 0,
+  kr: -1 // 韩服比国服早1小时
+}
+
+// 重置时间配置(国服时间,韩服自动-1)
+export const RESET_CONFIG = {
+  dailyHours: [5, 17],        // 每日重置时间(国服)
+  weeklyDay: 3,              // 每周重置日(0=周日,3=周三)
+  energyIntervalHours: 3,    // 能量恢复间隔
+  energyRecoveryMember: 15,  // 会员每3小时恢复量
+  energyRecoveryNonMember: 10, // 非会员每3小时恢复量
+  energyCap: 840,            // 能量上限
+  // 远征/超越/噩梦/树古 上限
+  expeditionCap: 14,
+  transcendCap: 7,
+  nightmareCap: 14,
+  shugoCap: 14,
+  shugoMemberExtra: 2,      // 会员额外恢复
+  shugoNonMemberExtra: 1,   // 非会员额外恢复
+  // 商店/转换奥德
+  shopExchangeCap: 20
 }

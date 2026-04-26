@@ -624,7 +624,11 @@ export const useUIStore = defineStore('ui', () => {
     customSortEnabled: false,
     sortLocked: false,
     themeMode: 'game',
-    serverRegion: 'cn'
+    serverRegion: 'cn',
+    lastVisitTime: Date.now(),
+    lastEnergyRecoveryTime: Date.now(),
+    lastDailyResetTime: Date.now(),
+    lastWeeklyResetTime: Date.now()
   }))
 
   // 监听变化
@@ -715,3 +719,220 @@ export const useBackupStore = defineStore('backup', () => {
     importData
   }
 })
+
+// ============ 定时任务重置系统 ============
+import { RESET_CONFIG, SERVER_TIME_OFFSET } from '@/types'
+
+/**
+ * 获取服务器本地时间戳
+ */
+function getServerTime(serverRegion: 'cn' | 'kr'): Date {
+  const now = new Date()
+  const offset = SERVER_TIME_OFFSET[serverRegion]
+  return new Date(now.getTime() + offset * 60 * 60 * 1000)
+}
+
+/**
+ * 获取当天指定小时的时间戳(服务器时间)
+ */
+function getTodayTimestampAtHour(hour: number, serverRegion: 'cn' | 'kr'): number {
+  const serverTime = getServerTime(serverRegion)
+  const today = new Date(serverTime)
+  today.setHours(hour, 0, 0, 0)
+  // 转回UTC时间戳
+  return today.getTime() - SERVER_TIME_OFFSET[serverRegion] * 60 * 60 * 1000
+}
+
+/**
+ * 获取本周三5点的时间戳(服务器时间)
+ */
+function getThisWednesday5Timestamp(serverRegion: 'cn' | 'kr'): number {
+  const serverTime = getServerTime(serverRegion)
+  const today = new Date(serverTime)
+  const dayOfWeek = today.getDay()
+  const daysUntilWednesday = (3 - dayOfWeek + 7) % 7
+  today.setDate(today.getDate() + daysUntilWednesday)
+  today.setHours(5, 0, 0, 0)
+  // 如果今天已经是周三但还没到5点,获取的是上周三,需要加7天
+  if (daysUntilWednesday === 0 && serverTime.getHours() < 5) {
+    today.setDate(today.getDate() + 7)
+  }
+  return today.getTime() - SERVER_TIME_OFFSET[serverRegion] * 60 * 60 * 1000
+}
+
+/**
+ * 计算能量恢复
+ * @param lastRecoveryTime 上次恢复时间戳
+ * @param currentEnergy 当前能量
+ * @param isMember 是否会员
+ * @returns 恢复后的能量值
+ */
+function calculateEnergyRecovery(
+  lastRecoveryTime: number,
+  currentEnergy: number,
+  isMember: boolean
+): number {
+  const now = Date.now()
+  const elapsed = now - lastRecoveryTime
+  const intervalMs = RESET_CONFIG.energyIntervalHours * 60 * 60 * 1000
+  const periods = Math.floor(elapsed / intervalMs)
+  
+  if (periods <= 0) return currentEnergy
+  
+  const recoveryAmount = isMember 
+    ? periods * RESET_CONFIG.energyRecoveryMember
+    : periods * RESET_CONFIG.energyRecoveryNonMember
+  
+  return Math.min(currentEnergy + recoveryAmount, RESET_CONFIG.energyCap)
+}
+
+/**
+ * 计算每日重置恢复次数
+ * @param lastResetTime 上次重置时间戳
+ * @param currentRuns 当前次数
+ * @param maxRuns 最大次数
+ * @param resetHours 重置小时数组 [5, 17]
+ * @param serverRegion 服务器区域
+ * @param perResetAmount 每次恢复数量
+ * @returns 恢复后的次数
+ */
+function calculateDailyReset(
+  lastResetTime: number,
+  currentRuns: number,
+  maxRuns: number,
+  resetHours: number[],
+  serverRegion: 'cn' | 'kr',
+  perResetAmount: number = 1
+): number {
+  if (currentRuns >= maxRuns) return currentRuns
+  
+  const now = Date.now()
+  let resetCount = 0
+  
+  for (const hour of resetHours) {
+    const resetTimestamp = getTodayTimestampAtHour(hour, serverRegion)
+    if (resetTimestamp > lastResetTime && resetTimestamp <= now) {
+      resetCount++
+    }
+    // 检查昨天的重置(如果上次访问是昨天)
+    const yesterdayReset = resetTimestamp - 24 * 60 * 60 * 1000
+    if (yesterdayReset > lastResetTime && yesterdayReset <= now) {
+      resetCount++
+    }
+  }
+  
+  return Math.min(currentRuns + resetCount * perResetAmount, maxRuns)
+}
+
+/**
+ * 应用所有定时任务重置
+ */
+export function applyScheduledResets(): void {
+  const uiStore = useUIStore()
+  const charStore = useCharacterStore()
+  const accountStore = useAccountStore()
+  
+  const now = Date.now()
+  const serverRegion = uiStore.settings.serverRegion
+  const lastVisit = uiStore.settings.lastVisitTime
+  
+  // 如果距离上次访问不足1分钟,跳过
+  if (now - lastVisit < 60 * 1000) return
+  
+  const { lastEnergyRecoveryTime, lastDailyResetTime, lastWeeklyResetTime } = uiStore.settings
+  
+  // 1. 能量恢复 (每3小时)
+  if (now - lastEnergyRecoveryTime >= RESET_CONFIG.energyIntervalHours * 60 * 60 * 1000) {
+    charStore.characters.forEach(char => {
+      const isMember = accountStore.accounts.find(a => a.id === char.accountId)?.data.isMember ?? false
+      const newEnergy = calculateEnergyRecovery(lastEnergyRecoveryTime, char.energy, isMember)
+      if (newEnergy !== char.energy) {
+        char.energy = newEnergy
+        char.updatedAt = now
+      }
+    })
+    uiStore.settings.lastEnergyRecoveryTime = now
+  }
+  
+  // 2. 每日重置 (5:00 和 17:00) - 远征、超越、噩梦、树古
+  const dailyResetHours = [5, 17]
+  let needsDailyReset = false
+  
+  for (const hour of dailyResetHours) {
+    const resetTimestamp = getTodayTimestampAtHour(hour, serverRegion)
+    if (resetTimestamp > lastDailyResetTime && resetTimestamp <= now) {
+      needsDailyReset = true
+      break
+    }
+    const yesterdayReset = resetTimestamp - 24 * 60 * 60 * 1000
+    if (yesterdayReset > lastDailyResetTime && yesterdayReset <= now) {
+      needsDailyReset = true
+      break
+    }
+  }
+  
+  if (needsDailyReset) {
+    charStore.characters.forEach(char => {
+      // 远征次数
+      char.runs = Math.min(char.runs + 1, char.maxRuns)
+      // 超越次数
+      char.transcendRuns = Math.min(char.transcendRuns + 1, char.maxTranscendRuns)
+      char.updatedAt = now
+    })
+    
+    // 账号维度噩梦和树古
+    accountStore.accounts.forEach(account => {
+      const isMember = account.data.isMember
+      // 噩梦次数 +2
+      account.data.nightmareRuns = Math.min(
+        account.data.nightmareRuns + 2,
+        account.data.nightmareMax
+      )
+      // 树古次数 会员+2 非会员+1
+      const shugoRecovery = isMember ? RESET_CONFIG.shugoMemberExtra : RESET_CONFIG.shugoNonMemberExtra
+      account.data.shugoRuns = Math.min(
+        account.data.shugoRuns + shugoRecovery,
+        account.data.shugoMax
+      )
+    })
+    
+    uiStore.settings.lastDailyResetTime = now
+  }
+  
+  // 3. 每周重置 (周三5:00)
+  const wednesdayTimestamp = getThisWednesday5Timestamp(serverRegion)
+  if (wednesdayTimestamp > lastWeeklyResetTime && wednesdayTimestamp <= now) {
+    // 圣域卢德莱奖励/挑战重置
+    charStore.characters.forEach(char => {
+      char.ludrelleRewardRuns = 2
+      char.ludrelleRuns = 4
+      char.ludrelleRewardExtra = 1
+      char.ludrelleExtra = 1
+      // 净化所
+      char.purifyRewardRuns = 2
+      char.purifyRuns = 4
+      char.purifyRewardExtra = 1
+      char.purifyExtra = 1
+      char.updatedAt = now
+    })
+    
+    // 深渊指令书、本地指令书、觉醒战重置
+    charStore.characters.forEach(char => {
+      char.tasks.abyssOrder = false
+      char.tasks.localOrder = false
+      char.tasks.awakening = false
+      char.updatedAt = now
+    })
+    
+    // 商店奥德、转换奥德重置
+    accountStore.accounts.forEach(account => {
+      account.data.shopRuns = RESET_CONFIG.shopExchangeCap
+      account.data.exchangeRuns = RESET_CONFIG.shopExchangeCap
+    })
+    
+    uiStore.settings.lastWeeklyResetTime = now
+  }
+  
+  // 更新最后访问时间
+  uiStore.settings.lastVisitTime = now
+}

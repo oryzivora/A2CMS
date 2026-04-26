@@ -10,8 +10,9 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from 'vue'
+import { watch, onMounted } from 'vue'
 import { useThemeStore } from '@/stores'
+import { applyScheduledResets } from '@/stores'
 import AppHeader from './components/AppHeader.vue'
 
 const themeStore = useThemeStore()
@@ -20,6 +21,11 @@ const themeStore = useThemeStore()
 watch(() => themeStore.isNight, (isNight) => {
   document.documentElement.setAttribute('data-theme', isNight ? 'night' : 'day')
 }, { immediate: true })
+
+// 应用定时任务重置
+onMounted(() => {
+  applyScheduledResets()
+})
 </script>
 
 <style>
