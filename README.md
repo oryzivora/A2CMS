@@ -159,6 +159,22 @@ A2CMS/
 
 本项目仅供学习交流使用。
 
+## 🤖 关于开发
+
+本项目完全由 AI 开发完成，前后期采用不同的 AI 开发工具：
+
+- **前期**：使用 OpenCode 进行开发
+- **后期**：切换至 Claude Code
+- **主力模型**：MiniMax2.7 🚀
+
+## 💡 MiniMax Token Plan 惊喜上线！
+
+新增语音、音乐、视频和图片生成权益。邀请好友享双重好礼，助力开发体验！
+
+好友立享 **9折** 专属优惠 + Builder 权益，你赢返利 + 社区特权！
+
+👉 立即参与：https://platform.minimaxi.com/subscribe/token-plan?code=1GA4IxbMwM&source=link
+
 ## 👤 作者
 
 **老登怎么办**
