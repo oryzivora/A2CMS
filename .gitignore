@@ -33,5 +33,9 @@ pnpm-debug.log*
 # TypeScript cache
 *.tsbuildinfo
 
+# Claude Code
+.claude/
+CLAUDE.md
+
 # System Files
 Thumbs.db
