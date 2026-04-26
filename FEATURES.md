@@ -4,7 +4,7 @@
 
 ## 📝 文档说明
 此文档用于记录 A2CMS 项目的所有功能需求、设计决策和实现细节。
-最后更新：2026-04-24
+最后更新：2026-04-26
 
 ---
 
@@ -22,7 +22,7 @@
 - 资源规划者
 
 ### 1.4 当前版本
-- 版本号：0.2.0
+- 版本号：0.3.0
 - 开发阶段：Beta
 - 作者：老登怎么办
 - 联系方式：https://space.bilibili.com/2492373
@@ -147,21 +147,53 @@ interface Character {
   id: string                                    // 唯一ID
   name: string                                  // 角色名称
   role: string                                  // 职业 (剑星/杀星/魔道星等)
+  race: Race                                    // 种族 (天族/魔族)
+  server: string                                // 服务器
+  accountId: string                             // 所属账号ID
   groupId: string                               // 所属分组ID
   teamId?: string                               // 所属小队ID
   stats: CharacterStats                         // 战斗属性
-  energy: number                                 // 当前奥德能量
-  maxEnergy: number                             // 最大能量 (默认840)
-  kina: number                                   // 基纳数量 (单位：万)
-  score: number                                  // 装备评分
-  runs: number                                   // 远征副本次数
-  transcendRuns: number                          // 超越副本次数
-  notes: string                                  // 备注信息
-  isLocked: boolean                              // 锁定状态
-  tasks: TaskStatus                              // 任务完成状态
-  serverType: 'tw' | 'kr'                        // 服务器类型
-  createdAt: number                              // 创建时间戳
-  updatedAt: number                              // 更新时间戳
+  energy: number                                // 当前基础奥德能量 (上限840)
+  maxEnergy: number                             // 基础最大能量
+  extraEnergy: number                           // 附加奥德能量 (上限2000)
+  maxExtraEnergy: number                        // 附加最大能量
+  kina: number                                  // 基纳数量 (单位：万)
+  score: number                                 // 装分
+  combatPower: number                            // 战斗力
+  // 远征
+  runs: number                                  // 远征当前次数
+  maxRuns: number                              // 远征基础上限 (默认14)
+  extraRuns: number                            // 远征补充上限 (默认10)
+  finalRuns: number                            // 远征最终消灭次数
+  extraFinalRuns: number                       // 远征最终补充次数
+  maxFinalRuns: number                         // 远征最终上限 (默认35)
+  // 超越
+  transcendRuns: number                         // 超越当前次数
+  maxTranscendRuns: number                     // 超越基础上限 (默认7)
+  extraTranscendRuns: number                    // 超越补充上限 (默认10)
+  transcendFinalRuns: number                    // 超越最终消灭次数
+  extraTranscendFinalRuns: number              // 超越最终补充次数
+  maxTranscendFinalRuns: number                // 超越最终上限 (默认28)
+  // 圣域-卢德莱
+  ludrelleRuns: number                         // 挑战当前次数
+  ludrelleExtra: number                       // 挑战补充次数
+  ludrelleRewardRuns: number                   // 奖励当前次数
+  ludrelleRewardExtra: number                  // 奖励补充次数
+  // 圣域-净化所
+  purifyRuns: number                           // 挑战当前次数
+  purifyExtra: number                          // 挑战补充次数
+  purifyRewardRuns: number                     // 奖励当前次数
+  purifyRewardExtra: number                    // 奖励补充次数
+  // 噩梦挑战
+  nightmareRuns: number                       // 挑战当前次数
+  nightmareExtra: number                      // 补充次数
+  nightmareMax: number                        // 基本上限(14)
+  nightmareExtraMax: number                    // 补充上限(30)
+  notes: string                                // 备注信息
+  isLocked: boolean                            // 锁定状态
+  tasks: TaskStatus                            // 任务完成状态
+  createdAt: number                            // 创建时间戳
+  updatedAt: number                            // 更新时间戳
 }
 
 interface CharacterStats {
@@ -255,37 +287,42 @@ interface AccountData {
   dailyDungeonExtraMax: number  // 补充上限(30)
   // 树古庆典
   shugoRuns: number             // 奖励钥匙当前次数
-  shugoExtra: number           // 补充次数
+  shugoExtra: number            // 补充次数
   shugoMax: number             // 基本上限(14)
   shugoExtraMax: number        // 补充上限(30)
+  // 深渊指令
+  abyssOrderCompleted: boolean  // 是否完成深渊指令
   // 噩梦挑战
-  nightmareRuns: number       // 挑战当前次数
+  nightmareRuns: number        // 挑战当前次数
   nightmareExtra: number      // 补充次数
-  nightmareMax: number       // 基本上限(14)
-  nightmareExtraMax: number   // 补充上限(30)
-  // 深渊指令书
-  abyssOrderCompleted: boolean  // 完成状态（布尔型）
-  // 本地指令书
-  weeklyMissionRuns: number    // 本周完成次数
-  weeklyMissionMax: number     // 本周上限(12)
+  nightmareMax: number        // 基本上限(14)
+  nightmareExtraMax: number    // 补充上限(30)
+  // 每周指令
+  weeklyMissionRuns: number    // 当前次数
+  weeklyMissionMax: number    // 上限(12)
   // 每日使命
-  dailyMissionRuns: number     // 今日完成次数
+  dailyMissionRuns: number     // 当前次数
   dailyMissionMax: number      // 今日上限(5)
   // 商店奥德
-  shopRuns: number            // 当前完成次数
-  shopMax: number             // 上限(20)
+  shopRuns: number            // 商店奥德当前次数
+  shopMax: number             // 上限(1)
   // 转换奥德
-  exchangeRuns: number        // 当前完成次数
-  exchangeMax: number         // 上限(20)
+  exchangeRuns: number        // 转换奥德当前次数
+  exchangeMax: number         // 上限(1)
+  // 会员
+  isMember: boolean            // 是否会员
+  memberExpireTime?: number   // 会员到期时间戳(毫秒)
 }
 
 interface Account {
   id: string
   name: string                 // 账号名称
-  race: string                // 种族
-  server: string              // 服务器
-  data: AccountData           // 账号维度数据
+  race: Race                   // 种族
+  server: string               // 服务器
+  data: AccountData            // 账号维度数据
 }
+
+type Race = '天族' | '魔族'
 ```
 
 **完成状态判定逻辑**：
@@ -295,8 +332,8 @@ interface Account {
 | 每日使命 | runs === 0 | 清空=完成 |
 | 本地指令书 | runs === 0 | 清空=完成 |
 | 深渊指令书 | abyssOrderCompleted === true | 布尔型 |
-| 商店奥德 | runs === 0 | 清空=完成 |
-| 转换奥德 | runs === 0 | 清空=完成 |
+| 商店奥德 | runs >= shopMax (1) | 达到上限=完成 |
+| 转换奥德 | runs >= exchangeMax (1) | 达到上限=完成 |
 
 **账号数据栏 (AccountBar.vue)**：
 - 位置：页面顶部，账号数据栏独立一行
@@ -361,11 +398,11 @@ interface Account {
 | 圣域卢德莱挑战 | 4 | 角色 |
 | 圣域净化所奖励 | 2 | 角色 |
 | 圣域净化所挑战 | 4 | 角色 |
-| 深渊指令书 | 未完成 | 角色 |
-| 本地指令书 | 未完成 | 角色 |
-| 觉醒战 | 未完成 | 角色 |
-| 商店奥德 | 20 | 账号 |
-| 转换奥德 | 20 | 账号 |
+| 深渊指令书 | 重置为未完成 | 角色 |
+| 本地指令书 | 重置为0 | 角色 |
+| 觉醒战 | 重置为未完成 | 角色 |
+| 商店奥德 | 重置为0 | 账号 |
+| 转换奥德 | 重置为0 | 账号 |
 
 **能量恢复 (每3小时)**:
 | 会员 | 非会员 | 上限 |
