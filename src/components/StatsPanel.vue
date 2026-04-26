@@ -498,6 +498,7 @@ const progressColor = (percentage: number) => {
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   flex: 1;
+  white-space: nowrap;
 }
 
 .card-body-content {
@@ -513,6 +514,7 @@ const progressColor = (percentage: number) => {
 
 .hint-text {
   font-size: var(--font-size-xs);
+  white-space: nowrap;
 }
 
 .hint-text.success {
@@ -543,12 +545,14 @@ const progressColor = (percentage: number) => {
 .stat-label {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .stat-value {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .stat-value.warning {
