@@ -10,10 +10,10 @@
           <span class="nav-icon">👥</span>
           角色管理
         </router-link>
-        <a href="./docs/USAGE.md" target="_blank" class="nav-item">
+        <router-link to="/help" class="nav-item" :class="{ active: currentRoute === '/help' }">
           <span class="nav-icon">📖</span>
           使用指南
-        </a>
+        </router-link>
       </nav>
     </div>
     <div class="header-right">
