@@ -48,7 +48,24 @@ export const raceServers: Record<string, Array<{ value: string; label: string }>
     { value: '科奇隆', label: '科奇隆' }
   ],
   '魔族': [
-    { value: '耙耙龙', label: '耙耙龙' }
+    { value: '伊斯拉佩爾', label: '伊斯拉佩爾' },
+    { value: '吉凱爾', label: '吉凱爾' },
+    { value: '崔妮爾', label: '崔妮爾' },
+    { value: '露梅爾', label: '露梅爾' },
+    { value: '瑪爾庫坦', label: '瑪爾庫坦' },
+    { value: '阿斯佩爾', label: '阿斯佩爾' },
+    { value: '艾萊修奇卡', label: '艾萊修奇卡' },
+    { value: '布里特拉', label: '布里特拉' },
+    { value: '奈蒙', label: '奈蒙' },
+    { value: '哈達爾', label: '哈達爾' },
+    { value: '盧德萊', label: '盧德萊' },
+    { value: '鄔爾古倫', label: '鄔爾古倫' },
+    { value: '默尼', label: '默尼' },
+    { value: '奧達爾', label: '奧達爾' },
+    { value: '簡卡卡', label: '簡卡卡' },
+    { value: '克羅梅德', label: '克羅梅德' },
+    { value: '奎靈', label: '奎靈' },
+    { value: '巴巴隆', label: '巴巴隆' }
   ]
 }
 
