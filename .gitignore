@@ -37,5 +37,8 @@ pnpm-debug.log*
 .claude/
 CLAUDE.md
 
+# Deploy scripts (local only, not committed)
+deploy/
+
 # System Files
 Thumbs.db
